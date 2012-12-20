@@ -1,11 +1,17 @@
-package com.dinaa.fastXml;
+package com.tooltwist.fastXml;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Vector;
+
+import com.tooltwist.xdata.X2DataException;
+import com.tooltwist.xdata.X2DataIterator;
+import com.tooltwist.xdata.XIteratorCallback;
+import com.tooltwist.xdata.XSelectable;
 
 /**
  * This class is used to provide high speed XML access. In particular, it avoids creating large numbers of XML objects, like the DOM parser. This parser does not provide comprehensive XPATH or DOM operations. If attempts to use complex XPATHS are attempted, a FastXmlBeyondCapabilityException will be thrown.
@@ -14,7 +20,7 @@ import java.util.Vector;
  * @see com.dinaa.XData
  * 
  */
-public class FastXml {
+public class FastXml implements XSelectable, Iterable<XSelectable> {
 	public static final int ROOT_NODE = -1;
 
 	private static final int TYPE_HEADER = 1; // <?xml ... ?>
@@ -66,6 +72,7 @@ public class FastXml {
 			}
 		}
 
+		init(arr);
 	}
 
 	void init(char xml[]) throws FastXmlException {
@@ -681,7 +688,8 @@ public class FastXml {
 		}
 
 		list.first();
-		if (list.next()) {
+		if (list.hasNext()) {
+			list.next();
 			int nodeNum = list.getNodeNum();
 			return getValue(nodeNum, true); // Need to remove escape sequences
 		}
@@ -825,6 +833,122 @@ public class FastXml {
 
 	public String getXml() {
 		return new String(this.xml);
+	}
+
+	//--------------------------------------------------------------------------------------------------------------------
+	// Methods for accessing data.
+	
+	public String string(String xpath) throws X2DataException {
+		try {
+			return getText(xpath);
+		} catch (Exception e) {
+			X2DataException exception = new X2DataException(e.getMessage());
+			exception.setStackTrace(e.getStackTrace());
+			throw exception;
+		}
+	}
+
+
+	//--------------------------------------------------------------------------------------------------------------------
+	// Return the number of records that can be iterated over.
+
+	public int size() {
+		return 1;
+	}
+	
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Iterate over this object using first, next.
+	
+	private boolean beenToFirst = false;
+
+	/**
+	 * This data type does not provide a list of records, so the {@link #next()} method only returns true once.<p>
+	 * To iterate over elements within this object, use {@link #select(String)} or one of the {@link #foreach(String)} methods.
+	 */
+	public void first() {
+		beenToFirst = false;
+	}
+
+	/**
+	 * This data type does not provide a list of records, so this method only returns true until {@link #next()} is called.<p> 
+	 * To iterate over elements within this object, use {@link #select(String)} or one of the {@link #foreach(String)} methods.
+	 */
+	public boolean hasNext() {
+		if (beenToFirst)
+			return false;
+		return true;
+	}
+
+	/**
+	 * This data type does not provide a list of records, so this method only returns true one time. Actually it serves
+	 * no purpose other than to allow iterators to access the data that can be accessed directly. For example,
+	 * <pre>
+	 * FastXml data = ...;
+	 * String value = data.string("./name");
+	 * </pre>
+	 * will return exactly the same as:
+	 * <pre>
+	 * FastXml data = ...;
+	 * while (data.next()) {
+	 *   String value = data.string("./name");
+	 * }
+	 * </pre>
+	 * <p>
+	 * To iterate over a list of elements <i>within</i> this data object, use {@link #select(String)} or one of the {@link #foreach(String)} methods.
+	 */
+	public boolean next() {
+		if (beenToFirst)
+			return false;
+		beenToFirst = true;
+		return true;
+	}
+
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Iterate over this object using a Java iterator
+	
+	public Iterator<XSelectable> iterator() {
+		return new X2DataIterator(this);
+	}
+	
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Select elements within this data object
+
+	public XSelectable select(String xpath) {
+		return getNodes(xpath);
+	}
+
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Select and iterate using a callback
+
+	public void foreach(String xpath, XIteratorCallback callback) throws X2DataException {
+		foreach(xpath, callback, null);
+	}
+
+	public void foreach(String xpath, Object userData, XIteratorCallback callback) throws X2DataException {
+		try {
+			XSelectable list = this.getNodes(xpath);
+			for (int index = 0; list.hasNext(); index++) {
+				list.next();
+				callback.next(list, index, userData);
+			}
+		} catch (Exception e) {
+			X2DataException exception = new X2DataException(e.getMessage());
+			exception.setStackTrace(e.getStackTrace());
+			throw exception;
+		}
+	}
+
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Select and iterate using a Java iterator
+	
+	public Iterable<XSelectable> foreach(String xpath) throws X2DataException {
+		FastXmlNodes list = this.getNodes(xpath);
+		return list;
 	}
 
 	// private void list()

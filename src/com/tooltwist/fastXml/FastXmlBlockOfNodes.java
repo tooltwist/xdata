@@ -1,4 +1,4 @@
-package com.dinaa.fastXml;
+package com.tooltwist.fastXml;
 
 class FastXmlBlockOfNodes {
 	protected static final int SIZE = 1024;
