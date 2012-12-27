@@ -1,49 +1,87 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Xdata by tooltwist</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Xdata : Cross Data converter and in-process transport format" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Xdata</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Xdata</h1>
-        <p>Cross Data converter and in-process transport format</p>
 
-        <p class="view"><a href="https://github.com/tooltwist/xdata">View the Project on GitHub <small>tooltwist/xdata</small></a></p>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/tooltwist/xdata">View on GitHub</a>
 
+          <h1 id="project_title">Xdata</h1>
+          <h2 id="project_tagline">Cross Data converter and in-process transport format</h2>
 
-        <ul>
-          <li><a href="https://github.com/tooltwist/xdata/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/tooltwist/xdata/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/tooltwist/xdata">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <p>XData (aka <em>Cross Data</em>) is a arbitrary data format, used to pass information around within a multi-layered application.</p>
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/tooltwist/xdata/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/tooltwist/xdata/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>What is it?</h2>
+
+<p>XData (aka <em>Cross Data</em>) is an "arbitrary data format" library for Java, allowing data to be passed information around within a multi-layered Java application without concern for the data format.</p>
 
 <p><img src="https://raw.github.com/tooltwist/xdata/master/docs/images/basic-idea-1.jpeg" alt="https://raw.github.com/tooltwist/xdata/master/docs/images/basic-idea-1.jpeg"></p>
 
-<p>In an application architecture where a website is constructed by assembling components, the source of the data is not known at the time the UI components are written. In fact, a UI component may be used in many applications, with many data sources.</p>
+<h2>Why?</h2>
+
+<p>In an application architecture where a website is constructed by assembling components, the source of the data is not known at the time the UI components are written. A UI component may be used in many applications with many data sources, and there's no way of knowing the format of those data sources at the time the UI component is written. XData allows the UI component to be developed without consideration for whether data will be provided as XML, JSON, or some other format.</p>
 
 <p>Similarly, the code to access data may not know the format expected by other code that consumes that data.</p>
 
-<p>XData provides a format-neutral mechanism for accessing data in a variety of formats.</p>
+<p>XData provides a format-neutral mechanism for passing around data in a variety of formats, but with a consistent API for accessing the data. For example, the following XPath-like code can be used to access both XML and JSON data.</p>
+
+<pre><code>XD data = getCountryData();
+for (XD state : data.select("/*/state")) {
+    System.out.println("State is " + state.getString("name"));
+}
+</code></pre>
+
+<h2>Mapping</h2>
+
+<p>In many cases, the source of data may use different field names to the consumer of that data, even though the values are acceptable. For example, a graph UI component might display X versus Y, but a data source provides <em>lengthOfHair</em> versus <em>lengthOfMoustache</em>. XData allows a simple mapping of field names between the source and the time the data is accessed, including the ability to access nested data.</p>
+
+<pre><code>person/lengthOfHair -&gt; graph/x
+person/lower_face_information/lengthOfMoustach -&gt; graph/y
+</code></pre>
+
+<h2>Fast Parser</h2>
+
+<p>XData also provides <em>fast parsing</em> to give improved performance in cases where the data is large. Typical XML and JSON parsers convert input data from string format into an object representation of the data (e.g. DOM). While this provides flexibility, it can result in a lot of instantiation and garbage collection overhead, creating objects for every element in the document, when typically only part of the data may be required.</p>
+
+<p>XData's <em>fast parsing</em> creates an index over the string representation of the document which is then used to cherry pick specific data values. In some applications, such as accessing large data sets over a Restful interface, this approach can be about ten times faster than common parsers, once garbage collection cost is taken into account. Take a look at the benchmarks section in the wiki for an understanding of where this is appropriate.</p>
+
+<h1>Documentation</h1>
+
+<p>See the <a href="https://github.com/tooltwist/xdata/wiki">XData wiki</a> for more information.</p>
+
+<h2></h2>
       </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/tooltwist">tooltwist</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Xdata maintained by <a href="https://github.com/tooltwist">tooltwist</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
+
     
+
   </body>
 </html>
