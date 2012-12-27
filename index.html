@@ -28,25 +28,27 @@
         </ul>
       </header>
       <section>
-        <h2>What is it?</h2>
+        <h2>What</h2>
 
-<p>XData (aka <em>Cross Data</em>) is an "arbitrary data format" library for Java, allowing data to be passed information around within a multi-layered Java application without concern for the data format.</p>
+<p>XData (aka <em>Cross Data</em>) is an "arbitrary data format" library for Java, allowing data to be passed around within a multi-layered Java application without concern for whether it's in XML, JSON, or some other format.</p>
 
 <p><img src="https://raw.github.com/tooltwist/xdata/master/docs/images/basic-idea-1.jpeg" alt="https://raw.github.com/tooltwist/xdata/master/docs/images/basic-idea-1.jpeg"></p>
 
-<h2>Why?</h2>
+<h2>Why</h2>
 
-<p>In an application architecture where a website is constructed by assembling components, the source of the data is not known at the time the UI components are written. A UI component may be used in many applications with many data sources, and there's no way of knowing the format of those data sources at the time the UI component is written. XData allows the UI component to be developed without consideration for whether data will be provided as XML, JSON, or some other format.</p>
+<p>In an application architecture where a website is constructed by assembling components, the source of the data is not known at the time the UI components are written. A UI component may be used in many applications with many data sources, and there's no way of knowing the format of those various data sources at the time the UI component is written. XData allows such components to be developed without consideration for whether data will be provided as XML, JSON, or some other format.</p>
 
 <p>Similarly, the code to access data may not know the format expected by other code that consumes that data.</p>
 
-<p>XData provides a format-neutral mechanism for passing around data in a variety of formats, but with a consistent API for accessing the data. For example, the following XPath-like code can be used to access both XML and JSON data.</p>
+<p>XData provides a format-neutral mechanism for passing around data, but a consistent API for accessing data. For example, the following XPath-like code can be used to access both XML and JSON data.</p>
 
 <pre><code>XD data = getCountryData();
 for (XD state : data.select("/*/state")) {
     System.out.println("State is " + state.getString("name"));
 }
 </code></pre>
+
+<p>XData also allows access to object representations of data (e.g. XML as DOM), with automatic conversions transparently performed as required.</p>
 
 <h2>Mapping</h2>
 
