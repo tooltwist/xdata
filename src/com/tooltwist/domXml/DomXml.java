@@ -19,6 +19,7 @@ import org.apache.xml.utils.PrefixResolverDefault;
 import org.apache.xpath.XPath;
 import org.apache.xpath.XPathContext;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -133,6 +134,15 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	}
 
 	/**
+	 * Return the document object at the head of the DOM representation of the XML.
+	 * 
+	 * @return
+	 */
+	public Document getDocument() {
+		return document;
+	}
+
+	/**
 	 * Return the text value in the first node that matches a specified XPATH below a specified starting point.
 	 * 
 	 * @return The text contained in the first node that matches the specified XPath.
@@ -142,7 +152,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	protected PrefixResolver getPrefixResolver() {
+	public PrefixResolver getPrefixResolver() {
 
 		//
 		// prefixResolver = null;
@@ -166,7 +176,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	protected int getRootContextNode() {
+	public int getRootContextNode() {
 
 		if (rootContextNode >= 0)
 			return rootContextNode;
@@ -188,7 +198,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	private XPathContext getRootXPathContext() {
+	public XPathContext getRootXPathContext() {
 
 		if (rootXpathContext != null)
 			return rootXpathContext;
@@ -341,7 +351,8 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods for the XSelectable interface
 
-	public String string(String xpath) throws X2DataException {
+	@Override
+	public String getString(String xpath) throws X2DataException {
 		NodeList nl = getNodeList(xpath);
 		String text = getTextFromNodeList(nl);
 		return text;
@@ -351,13 +362,13 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterating over this current object, even though it's not a list.
 
+	@Override
 	public int size() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	@Override
 	public Iterator<XSelectable> iterator() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -370,6 +381,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * This data type does not provide a list of records, so the {@link #next()} method only returns true once.<p>
 	 * To iterate over elements within this object, use {@link #select(String)} or one of the {@link #foreach(String)} methods.
 	 */
+	@Override
 	public void first() {
 		beenToFirst = false;
 	}
@@ -378,10 +390,22 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * This data type does not provide a list of records, so this method only returns true until {@link #next()} is called.<p> 
 	 * To iterate over elements within this object, use {@link #select(String)} or one of the {@link #foreach(String)} methods.
 	 */
+	@Override
 	public boolean hasNext() {
 		if (beenToFirst)
 			return false;
 		return true;
+	}
+
+	@Override
+	public int currentIndex() {
+		return 0;
+	}
+
+	@Override
+	public String currentName() {
+		Element element = document.getDocumentElement();
+		return element.getNodeName();
 	}
 
 	/**

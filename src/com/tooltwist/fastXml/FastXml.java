@@ -470,7 +470,7 @@ public class FastXml implements XSelectable, Iterable<XSelectable> {
 	}
 
 	void syntax(String error) throws FastXmlException {
-		String str = "Xml parse error on line " + lineCnt + ": " + error + "\n" + thisLine() + "\n" + positionMarker(offset);
+		String str = "XML parse error on line " + lineCnt + ": " + error + "\n" + thisLine() + "\n" + positionMarker(offset);
 		throw new FastXmlException(str);
 	}
 
@@ -493,7 +493,7 @@ public class FastXml implements XSelectable, Iterable<XSelectable> {
 		return spacer;
 	}
 
-	public String getTagName(int nodeNum) {
+	protected String getNameOfNode(int nodeNum) {
 		FastXmlBlockOfNodes block = firstBlock.getBlock(nodeNum, false);
 		int index = nodeNum % FastXmlBlockOfNodes.SIZE;
 		return block.name[index];
@@ -838,7 +838,7 @@ public class FastXml implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods for accessing data.
 	
-	public String string(String xpath) throws X2DataException {
+	public String getString(String xpath) throws X2DataException {
 		try {
 			return getText(xpath);
 		} catch (Exception e) {
@@ -850,17 +850,13 @@ public class FastXml implements XSelectable, Iterable<XSelectable> {
 
 
 	//--------------------------------------------------------------------------------------------------------------------
-	// Return the number of records that can be iterated over.
+	// Iterate over this object using first, next.
+	
+	private boolean beenToFirst = false;
 
 	public int size() {
 		return 1;
 	}
-	
-	
-	//--------------------------------------------------------------------------------------------------------------------
-	// Iterate over this object using first, next.
-	
-	private boolean beenToFirst = false;
 
 	/**
 	 * This data type does not provide a list of records, so the {@link #next()} method only returns true once.<p>
@@ -881,7 +877,7 @@ public class FastXml implements XSelectable, Iterable<XSelectable> {
 	}
 
 	/**
-	 * This data type does not provide a list of records, so this method only returns true one time. Actually it serves
+	 * This selector does not provide a list of records, so this method only returns true one time. Actually it serves
 	 * no purpose other than to allow iterators to access the data that can be accessed directly. For example,
 	 * <pre>
 	 * FastXml data = ...;
@@ -902,6 +898,17 @@ public class FastXml implements XSelectable, Iterable<XSelectable> {
 			return false;
 		beenToFirst = true;
 		return true;
+	}
+	
+	@Override
+	public int currentIndex() {
+		return 0;
+	}
+
+	@Override
+	public String currentName() {
+		FastXmlBlockOfNodes block = firstBlock.getBlock(0, false);
+		return block.name[0];
 	}
 
 	

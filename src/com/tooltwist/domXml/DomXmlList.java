@@ -16,38 +16,11 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	private DomXml xmlData;	// only used to get the XPath values
 	private int index = -1;	// Current index in this linked list
 
-	public DomXmlList(NodeList nl, DomXml domXml) {
-		super();
-
-		this.list = nl;
-		this.xmlData = domXml;
-	}
+	//--------------------------------------------------------------------------------------------------------------------
+	// Methods for accessing data.
 	
-	private Node getCurrentNode() {
-		if (index >= 0 && index < list.getLength())
-			return list.item(index);
-		return null;
-	}
 
-	/**
-	 * Get a list of nodes that match a XPath, starting at the current node in this list.
-	 * 
-	 * @return The list of nodes that match the XPath.
-	 * @param xpath
-	 *            An XPath specifier.
-	 */
-	public DomXmlList getNodes(String xpath) throws X2DataException {
-		Node node = getCurrentNode();
-		if (node == null)
-			return null;
-		return xmlData.getNodes(xpath, node);
-	}
-
-	public Iterator<XSelectable> iterator() {
-		return new X2DataIterator(this);
-	}
-
-	public String string(String xpath) throws X2DataException {
+	public String getString(String xpath) throws X2DataException {
 		Node current = null;
 		if (index < 0) {
 			// Before calling next() - use the first record.
@@ -65,15 +38,12 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 		return xmlData.getText(xpath, current);
 	}
 
+
+	//--------------------------------------------------------------------------------------------------------------------
+	// Iterate over this object using first, next.
+
 	public int size() {
 		return (list == null) ? 0 : list.getLength();
-	}
-
-	public XSelectable select(String xpath) throws X2DataException {
-		Node node = getCurrentNode();
-		if (node == null)
-			return null;
-		return xmlData.getNodes(xpath, node);
 	}
 
 	public void first() {
@@ -98,6 +68,43 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 		return (index >= 0 && index < length);
 	}
 
+	@Override
+	public int currentIndex() {
+		if (index >= 0 && index < list.getLength())
+			return index;
+		return -1;
+	}
+	
+	@Override
+	public String currentName() {
+		if (index >= 0 && index < list.getLength())
+			return list.item(index).getNodeName();
+		return null;
+	}
+
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Iterate over this object using a Java iterator
+
+	public Iterator<XSelectable> iterator() {
+		return new X2DataIterator(this);
+	}
+	
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Select elements within this data object
+
+	public XSelectable select(String xpath) throws X2DataException {
+		Node node = getCurrentNode();
+		if (node == null)
+			return null;
+		return xmlData.getNodes(xpath, node);
+	}
+
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Select and iterate using a callback
+
 	public void foreach(String xpath, Object userData, XIteratorCallback callback) throws X2DataException {
 		DomXmlList list = this.getNodes(xpath);
 		for (int i = 0; list.next(); i++) {
@@ -109,8 +116,48 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 		foreach(xpath, null, callback);
 	}
 
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Select and iterate using a Java iterator
+	
 	public Iterable<XSelectable> foreach(String xpath) throws X2DataException {
 		return getNodes(xpath);
 	}
+	
+
+	/*--------------------------------------------------------------------------------------------------------------------
+	 *
+	 *											DOM Specific code below here.
+	 *
+	 */
+
+	protected DomXmlList(NodeList nl, DomXml domXml) {
+		super();
+
+		this.list = nl;
+		this.xmlData = domXml;
+	}
+	
+	private Node getCurrentNode() {
+		if (index >= 0 && index < list.getLength())
+			return list.item(index);
+		return null;
+	}
+
+
+	/**
+	 * Get a list of nodes that match a XPath, starting at the current node in this list.
+	 * 
+	 * @return The list of nodes that match the XPath.
+	 * @param xpath
+	 *            An XPath specifier.
+	 */
+	private DomXmlList getNodes(String xpath) throws X2DataException {
+		Node node = getCurrentNode();
+		if (node == null)
+			return null;
+		return xmlData.getNodes(xpath, node);
+	}
+
 
 }

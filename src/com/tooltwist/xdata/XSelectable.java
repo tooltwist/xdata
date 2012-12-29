@@ -46,6 +46,23 @@ public interface XSelectable {
 	 */
 	public boolean next();
 
+	/**
+	 * Return the name of the field currently selected. For example, if you used select("/* /customer") to get
+	 * this XSelectable object, then the field name will be "customer". 
+	 * 
+	 * @return
+	 */
+	public String currentName();
+	
+	/**
+	 * Return the index of the field currently selected. While iterating through a selection, this
+	 * counts through the items in the selection, starting at zero. 
+	 * 
+	 * @return
+	 */
+	public int currentIndex();
+
+
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods for accessing data
 
@@ -57,7 +74,7 @@ public interface XSelectable {
 	 * @throws XDataException
 	 * @throws XDataNotFoundException
 	 */
-	public String string(String xpath) throws X2DataException;
+	public String getString(String xpath) throws X2DataException;
 
 
 	//--------------------------------------------------------------------------------------------------------------------

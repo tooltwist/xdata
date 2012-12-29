@@ -64,7 +64,17 @@ public abstract class X2DataType {
 	//
 	// Methods used if getDataFormat() returns SELECTABLE_OBJECT.
 	//
-	
+
+	/**
+	 * If an X2Data is constructed using an object, this method is called for each non-string data
+	 * type, to see if this data type can be created. For example, when a XML-DOM type is created
+	 * from a Node object. 
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public abstract boolean objectIsRecognised(Object data);
+
 	/**
 	 * Convert from string representation to it's object form.
 	 * 

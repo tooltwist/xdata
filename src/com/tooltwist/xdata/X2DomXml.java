@@ -1,5 +1,8 @@
 package com.tooltwist.xdata;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import com.tooltwist.domXml.DomXml;
 
 public class X2DomXml extends X2DataType {
@@ -24,6 +27,16 @@ public class X2DomXml extends X2DataType {
 	//
 	// Methods used for a SELECTABLE_OBJECT.
 	//
+
+	@Override
+	public boolean objectIsRecognised(Object data) {
+		if (data instanceof Document) {
+			return true;
+		} else if (data instanceof Node) {
+			return true;
+		}
+		return false;
+	}
 	
 	@Override
 	public XSelectable stringToObject(String string) throws X2DataException {

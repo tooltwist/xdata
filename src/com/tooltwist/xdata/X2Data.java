@@ -34,9 +34,8 @@ public class X2Data {
 
 			// Register the standard types
 			registerType_internal("xml-string", new X2XmlString());
-			registerType_internal("xml-fast", new X2FastXml());
 			registerType_internal("xml-dom", new X2DomXml());
-//			registerType_internal("xml-dom", new X2XmlDom());
+			registerType_internal("xml-fast", new X2FastXml());
 			registerType_internal("json-string", new X2JsonString());
 			registerType_internal("json-fast", new X2FastJson());
 			
@@ -173,7 +172,7 @@ public class X2Data {
 		}
 	}
 
-	public Object getSelector() throws X2DataException {
+	public XSelectable getSelector() throws X2DataException {
 		
 		// See if we already have data in a selectable format.
 		for (int i = 0; i < numTypes && i < dataForType.length; i++) {
@@ -184,7 +183,7 @@ public class X2Data {
 				continue;
 			if (type.getDataFormat() == PluginStyle.SELECTABLE_OBJECT) {
 				// Have data, and it's a selectable
-				return object;
+				return (XSelectable) object;
 			}
 		}
 		
@@ -222,7 +221,7 @@ public class X2Data {
 					String dataInStringRepresentation = (String) dataForType[indexForStringData];
 					Object convertedObject = types[indexForSelectableData].stringToObject(dataInStringRepresentation);
 					dataForType[indexForSelectableData] = convertedObject;
-					return convertedObject;
+					return (XSelectable) convertedObject;
 				}
 				
 				// We couldn't convert this type of string... try the next.
@@ -266,5 +265,25 @@ public class X2Data {
 		// so we'll need to convert from some other data format that we do have.
 		//ZZZZZ
 		throw new X2DataUnknownConversionException("Could not convert to '" + type + "' format");
+	}
+
+	/**
+	 * Remove the definitions for all data formats except the one specified.
+	 * 
+	 * This is called if the contents of a specific data type has been changed by direct
+	 * communication with it's selector.
+	 * 
+	 * @param type
+	 * @throws X2DataIncompatibleFormatException 
+	 */
+	//ZZZZ Need to test
+	public void invalidateAllSelectorsExcept(String type) throws X2DataIncompatibleFormatException {
+		int objectTypeIndex = typeIndex(type);
+		if (objectTypeIndex < 0)
+			throw new X2DataIncompatibleFormatException("Unknown format '" + type + "'.");
+		for (int i = 0; i < numTypes; i++) {
+			if (i != objectTypeIndex)
+				dataForType[i] = null;
+		}
 	}
 }

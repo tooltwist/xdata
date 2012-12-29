@@ -41,6 +41,11 @@ public class X2JsonString extends X2DataType {
 	//
 	// Methods used for a SELECTABLE_OBJECT.
 	//
+
+	@Override
+	public boolean objectIsRecognised(Object data) {
+		return false;
+	}
 	
 	@Override
 	public XSelectable stringToObject(String string) {

@@ -56,19 +56,14 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 			return -1;
 		return selectList.nodeNum[selectPos];
 	}
-
-	public String getNodeName() {
-		if (selectPos < 0 || (selectList == addList && selectPos >= addPos))
-			return null;
-		return data.getTagName(selectList.nodeNum[selectPos]);
-	}
-
+	
 	public String getValue() throws FastXmlException {
 		if (selectList == addList && selectPos >= addPos)
 			return null;
 		return data.getValue(selectList.nodeNum[selectPos], true); // Need to un-escape stuff
 	}
 
+	//ZZZZZZ Remove some of this legacy stuff.
 	public String getText(String xpath) {
 		String value = getText(xpath, 0);
 		return value;
@@ -92,7 +87,7 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 		return data.getText(nodeNum, xpath, occurance);
 	}
 
-	public FastXmlNodes getNodes(String xpath) {
+	private FastXmlNodes getNodes(String xpath) {
 		// If next() hasn't been called yet, default to the first node.
 		if (selectPos < 0) {
 			if (numNodes < 1)
@@ -110,15 +105,16 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 		return data.getNodes(nodeNum, xpath);
 	}
 
-	public int getNumNodes() {
-		return this.numNodes;
-	}
+//	public int getNumNodes() {
+//		return this.numNodes;
+//	}
 
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods for accessing data.
 
-	public String string(String xpath) throws X2DataException {
+	@Override
+	public String getString(String xpath) throws X2DataException {
 		try {
 			String value = getText(xpath, 0);
 //			String value = getText(xpath);
@@ -134,6 +130,7 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Return the number of records that can be iterated over.
 
+	@Override
 	public int size() {
 		return this.numNodes;
 	}
@@ -142,11 +139,13 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterate over this object using first, next.
 	
+	@Override
 	public void first() {
 		selectList = this;
 		selectPos = -1;
 	}
 
+	@Override
 	public boolean hasNext() {
 		int tmpSelectPos = selectPos + 1;
 		FastXmlNodes tmpSelectList = selectList;
@@ -160,6 +159,7 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 		return true;
 	}
 	
+	@Override
 	public boolean next() {
 
 		// If we've run off the end previously, don't go any further.
@@ -180,6 +180,21 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 
 		// We haven't run off the end.
 		return true;
+	}
+
+	@Override
+	public int currentIndex() {
+		if (selectPos < 0 || (selectList == addList && selectPos >= addPos))
+			return -1;
+		return selectPos;
+	}
+
+	@Override
+	public String currentName()
+	{
+		if (selectPos < 0 || (selectList == addList && selectPos >= addPos))
+			return null;
+		return data.getNameOfNode(selectList.nodeNum[selectPos]);
 	}
 
 	

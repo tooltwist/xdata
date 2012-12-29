@@ -130,6 +130,7 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 		return data.getNodes(nodeNum, xpath);
 	}
 	
+	//ZZZZ Remove this old stuff
 	public int getNumNodes()
 	{
 		return this.numNodes;
@@ -139,7 +140,8 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods for accessing data.
 
-	public String string(String xpath) throws X2DataException {
+	@Override
+	public String getString(String xpath) throws X2DataException {
 		try {
 			String value = getText(xpath);
 			return value;
@@ -154,6 +156,7 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 	//--------------------------------------------------------------------------------------------------------------------
 	// Return the number of records that can be iterated over.
 
+	@Override
 	public int size() {
 		return this.numNodes;
 	}
@@ -162,12 +165,14 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterate over this object using first, next.
 	
+	@Override
 	public void first()
 	{
 		selectList = this;
 		selectPos = -1;
 	}
 
+	@Override
 	public boolean hasNext() {
 		int tmpSelectPos = selectPos + 1;
 		FastJsonNodes tmpSelectList = selectList;
@@ -181,6 +186,7 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 		return true;
 	}
 	
+	@Override
 	public boolean next() {
 
 		// If we've run off the end previously, don't go any further.
@@ -202,10 +208,28 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 		// We haven't run off the end.
 		return true;
 	}
+
+	@Override
+	public int currentIndex() {
+		if (selectPos < 0 || (selectList == addList && selectPos >= addPos))
+			return -1;
+		return selectPos;
+	}
+
+	@Override
+	public String currentName()
+	{
+		if (selectPos < 0 || (selectList == addList && selectPos >= addPos))
+			return null;
+		int nodeNum = selectList.nodeNum[selectPos];
+		String name = data.getFieldName(nodeNum);
+		return name;
+	}
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterate over this object using a Java iterator
 	
+	@Override
 	public Iterator<XSelectable> iterator() {
 		return new X2DataIterator(this);
 	}
@@ -214,6 +238,7 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select elements within this data object
 
+	@Override
 	public XSelectable select(String xpath) {
 		return getNodes(xpath);
 	}
@@ -222,10 +247,12 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select and iterate using a callback
 
+	@Override
 	public void foreach(String xpath, XIteratorCallback callback) throws X2DataException {
 		foreach(xpath, callback, null);
 	}
 
+	@Override
 	public void foreach(String xpath, Object userData, XIteratorCallback callback) throws X2DataException {
 		try {
 			XSelectable list = this.getNodes(xpath);
@@ -243,6 +270,7 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select and iterate using a Java iterator
 	
+	@Override
 	public Iterable<XSelectable> foreach(String xpath) throws X2DataException {
 		FastJsonNodes list = this.getNodes(xpath);
 		return list;

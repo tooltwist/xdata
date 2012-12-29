@@ -118,13 +118,13 @@ class FastJsonBlockOfNodes
 		System.out.println();
 	}
 	
-	void list(char[] json, int upTo)
+	void debugDump(char[] json, int upTo)
 	{
 		for (int cnt = 0; cnt < upTo; cnt++)
 		{
 			if (cnt >= SIZE)
 			{
-				next.list(json, upTo - SIZE);
+				next.debugDump(json, upTo - SIZE);
 				return;
 			}
 			displayNode(json, cnt);
