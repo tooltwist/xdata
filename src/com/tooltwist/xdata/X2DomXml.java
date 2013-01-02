@@ -5,7 +5,7 @@ import org.w3c.dom.Node;
 
 import com.tooltwist.domXml.DomXml;
 
-public class X2DomXml extends X2DataType {
+public class X2DomXml extends XDSelectorType {
 
 	@Override
 	public PluginStyle getDataFormat() {
@@ -24,12 +24,12 @@ public class X2DomXml extends X2DataType {
 	}
 	
 	@Override
-	public XSelectable stringToSelectable(X2Data parent, String string) throws X2DataException {
+	public XDSelector stringToSelectable(XD parent, String string) throws XDException {
 		DomXml fastXml;
 		try {
 			fastXml = new DomXml(parent, string);
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
@@ -52,7 +52,7 @@ public class X2DomXml extends X2DataType {
 	}
 
 	@Override
-	public XSelectable objectToSelectable(X2Data xd, Object object) throws X2DataException {
+	public XDSelector objectToSelectable(XD xd, Object object) throws XDException {
 		try {
 			if (object instanceof Document) {
 				DomXml fastXml = new DomXml(xd, (Document)object);
@@ -66,20 +66,20 @@ public class X2DomXml extends X2DataType {
 			}
 			
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
 	}
 
 	@Override
-	public String selectableToString(Object object) throws X2DataException {
+	public String selectableToString(Object object) throws XDException {
 		if (object instanceof DomXml) {
 			DomXml domXml = (DomXml) object;
 			String string = domXml.getXml();
 			return string;
 		}
-		throw new X2DataException("Internal error: object is not " + DomXml.class.getName());
+		throw new XDException("Internal error: object is not " + DomXml.class.getName());
 	}
 
 }

@@ -6,7 +6,7 @@ package com.tooltwist.xdata;
  * @author philipcallender
  *
  */
-public abstract class X2DataType {
+public abstract class XDSelectorType {
 	
 	public enum PluginStyle { STRING_REPRESENTATION, SELECTABLE_OBJECT };
 
@@ -67,9 +67,9 @@ public abstract class X2DataType {
 	 * 
 	 * @param dataInStringRepresentation
 	 * @return
-	 * @throws X2DataException
+	 * @throws XDException
 	 */
-	public abstract XSelectable stringToSelectable(X2Data parentXd, String dataInStringRepresentation) throws X2DataException;
+	public abstract XDSelector stringToSelectable(XD parentXd, String dataInStringRepresentation) throws XDException;
 
 
 
@@ -79,7 +79,7 @@ public abstract class X2DataType {
 	//
 
 	/**
-	 * If an X2Data is constructed using an object, this method is called for each non-string data
+	 * If an XD is constructed using an object, this method is called for each non-string data
 	 * type, to see if this data type can be created. For example, when a XML-DOM type is created
 	 * from a Node object. 
 	 * 
@@ -95,17 +95,17 @@ public abstract class X2DataType {
 	 * 
 	 * @param dataInStringRepresentation
 	 * @return
-	 * @throws X2DataException
+	 * @throws XDException
 	 */
-	public abstract XSelectable objectToSelectable(X2Data parentXd, Object object) throws X2DataException;
+	public abstract XDSelector objectToSelectable(XD parentXd, Object object) throws XDException;
 
 	/**
 	 * Convert an object of the type represented by this dataType into it's string representation.
 	 *  
 	 * @param object
 	 * @return
-	 * @throws X2DataException
+	 * @throws XDException
 	 */
-	public abstract String selectableToString(Object object) throws X2DataException;
+	public abstract String selectableToString(Object object) throws XDException;
 
 }

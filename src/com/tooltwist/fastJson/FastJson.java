@@ -11,10 +11,10 @@ import java.util.Vector;
 import com.tooltwist.fastJson.FastJsonBlockOfNodes;
 import com.tooltwist.fastJson.FastJsonException;
 import com.tooltwist.fastJson.FastJsonNodes;
-import com.tooltwist.xdata.X2DataException;
-import com.tooltwist.xdata.X2DataIterator;
-import com.tooltwist.xdata.XIteratorCallback;
-import com.tooltwist.xdata.XSelectable;
+import com.tooltwist.xdata.XDException;
+import com.tooltwist.xdata.XIterator;
+import com.tooltwist.xdata.XDCallback;
+import com.tooltwist.xdata.XDSelector;
 
 /**
  * Parse a JSON text object, without creating large numbers of Java objects.
@@ -25,7 +25,7 @@ import com.tooltwist.xdata.XSelectable;
  * @author philipcallender
  *
  */
-public class FastJson implements XSelectable, Iterable<XSelectable> {
+public class FastJson implements XDSelector, Iterable<XDSelector> {
 	
 	public static final int ROOT_NODE = -1;
 	
@@ -1319,14 +1319,14 @@ System.out.println(new String(json, offset, json.length-offset));
 	}
 
 	//--------------------------------------------------------------------------------------------------------------------
-	// Methods for the XSelectable interface
+	// Methods for the XDSelector interface
 
 	@Override
-	public String getString(String xpath) throws X2DataException {
+	public String getString(String xpath) throws XDException {
 		try {
 			return getText(xpath);
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
@@ -1398,7 +1398,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	}
 
 	@Override
-	public boolean setCurrentIndex(int index) throws X2DataException {
+	public boolean setCurrentIndex(int index) throws XDException {
 		if (index == 0)
 			return true;
 		return false;
@@ -1414,8 +1414,8 @@ System.out.println(new String(json, offset, json.length-offset));
 	// Iterate over this object using a Java iterator
 	
 	@Override
-	public Iterator<XSelectable> iterator() {
-		return new X2DataIterator(this);
+	public Iterator<XDSelector> iterator() {
+		return new XIterator(this);
 	}
 
 	
@@ -1424,7 +1424,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	// Select elements within this data object
 
 	@Override
-	public XSelectable select(String xpath) {
+	public XDSelector select(String xpath) {
 		return getNodes(xpath);
 	}
 
@@ -1433,20 +1433,20 @@ System.out.println(new String(json, offset, json.length-offset));
 	// Select and iterate using a callback
 
 	@Override
-	public void foreach(String xpath, XIteratorCallback callback) throws X2DataException {
+	public void foreach(String xpath, XDCallback callback) throws XDException {
 		foreach(xpath, callback, null);
 	}
 
 	@Override
-	public void foreach(String xpath, Object userData, XIteratorCallback callback) throws X2DataException {
+	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
 		try {
-			XSelectable list = this.getNodes(xpath);
+			XDSelector list = this.getNodes(xpath);
 			for (int index = 0; list.hasNext(); index++) {
 				list.next();
 				callback.next(list, index, userData);
 			}
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
@@ -1457,7 +1457,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	// Select and iterate using a Java iterator
 	
 	@Override
-	public Iterable<XSelectable> foreach(String xpath) throws X2DataException {
+	public Iterable<XDSelector> foreach(String xpath) throws XDException {
 		FastJsonNodes list = this.getNodes(xpath);
 		return list;
 	}

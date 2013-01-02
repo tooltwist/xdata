@@ -5,7 +5,7 @@ import java.util.Iterator;
 /**
  * A class that implements this interface can be used to access individual data elements, using the XData API.
  * 
- *   This interface automatically implies implementation of Iterable<XSelectable> and Iterator<XSelectable>,
+ *   This interface automatically implies implementation of Iterable<XDSelector> and Iterator<XDSelector>,
  *   meaning that the object can be used in standard Java iterations.
  *   
  *   Note that the definition of next() provided here is different to that in {@link XData#next()}.
@@ -13,7 +13,7 @@ import java.util.Iterator;
  * @author philipcallender
  *
  */
-public interface XSelectable {
+public interface XDSelector {
 
 
 	//--------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ public interface XSelectable {
 	 * Iterate through the selection.
 	 * @return
 	 */
-	public Iterator<XSelectable> iterator();
+	public Iterator<XDSelector> iterator();
 	
 	/**
 	 * Return the number of records in this selection.
@@ -48,7 +48,7 @@ public interface XSelectable {
 
 	/**
 	 * Return the name of the field currently selected. For example, if you used select("/* /customer") to get
-	 * this XSelectable object, then the field name will be "customer". 
+	 * this XDSelector object, then the field name will be "customer". 
 	 * 
 	 * @return
 	 */
@@ -69,9 +69,9 @@ public interface XSelectable {
 	 * Returns false if the index is invalid.
 	 * 
 	 * @param index
-	 * @throws X2DataException
+	 * @throws XDException
 	 */
-	public boolean setCurrentIndex(int index) throws X2DataException;
+	public boolean setCurrentIndex(int index) throws XDException;
 
 
 
@@ -86,7 +86,7 @@ public interface XSelectable {
 	 * @throws XDataException
 	 * @throws XDataNotFoundException
 	 */
-	public String getString(String xpath) throws X2DataException;
+	public String getString(String xpath) throws XDException;
 
 
 	//--------------------------------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ public interface XSelectable {
 	 * For example:
 	 * <pre>
 	 * XData data = ...;
-	 * XSelectable list = data.select("/* /product");
+	 * XDSelector list = data.select("/* /product");
 	 * while (list.next()) {
 	 * 	String description = list.string("description");
 	 * }
@@ -110,7 +110,7 @@ public interface XSelectable {
 	 * @throws XDataNotFoundException
 	 * @throws XDataException
 	 */
-	public XSelectable select(String xpath) throws X2DataException;
+	public XDSelector select(String xpath) throws XDException;
 
 	/**
 	 * Iterate through matching items using a callback object to handle each item.
@@ -118,7 +118,7 @@ public interface XSelectable {
 	 * <pre>
 	 * XData data = ...;
 	 * MyData myData = ...;
-	 * data.select("/* /product", myData, new XIteratorCallback() {
+	 * data.select("/* /product", myData, new XDCallback() {
 	 *   {@code @Override }
 	 *   public void next(IXData item, int index, Object data) throws XDataNotFoundException, XDataException {
 	 *     MyData myData = (MyData) data;
@@ -131,7 +131,7 @@ public interface XSelectable {
 	 * @throws XDataNotFoundException
 	 * @throws XDataException
 	 */
-	public void foreach(String xpath, Object userData, XIteratorCallback callback) throws X2DataException;
+	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException;
 
 	/**
 	 * Iterate through matching items using a callback object to handle each item.
@@ -139,7 +139,7 @@ public interface XSelectable {
 	 * <pre>
 	 * XData data = ...;
 	 * Object myData = ...;
-	 * data.select("/* /product", myData, new XIteratorCallback() {
+	 * data.select("/* /product", myData, new XDCallback() {
 	 *   {@code @Override }
 	 *   public void next(IXData item, int index, Object data) throws XDataNotFoundException, XDataException {
 	 * 	   String description = item.string("description");
@@ -151,7 +151,7 @@ public interface XSelectable {
 	 * @throws XDataNotFoundException
 	 * @throws XDataException
 	 */
-	public void foreach(String xpath, XIteratorCallback callback) throws X2DataException;
+	public void foreach(String xpath, XDCallback callback) throws XDException;
 
 	/**
 	 * Iterate through items using Iterable notation.
@@ -167,6 +167,6 @@ public interface XSelectable {
 	 * @return
 	 * @throws XDataException
 	 */
-	public Iterable<XSelectable> foreach(String xpath) throws X2DataException;
+	public Iterable<XDSelector> foreach(String xpath) throws XDException;
 
 }

@@ -5,12 +5,12 @@ import java.util.Iterator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.tooltwist.xdata.X2DataException;
-import com.tooltwist.xdata.X2DataIterator;
-import com.tooltwist.xdata.XIteratorCallback;
-import com.tooltwist.xdata.XSelectable;
+import com.tooltwist.xdata.XDException;
+import com.tooltwist.xdata.XIterator;
+import com.tooltwist.xdata.XDCallback;
+import com.tooltwist.xdata.XDSelector;
 
-public class DomXmlList implements XSelectable, Iterable<XSelectable> {
+public class DomXmlList implements XDSelector, Iterable<XDSelector> {
 
 	private NodeList list;
 	private DomXml xmlData;	// only used to get the XPath values
@@ -20,7 +20,7 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	// Methods for accessing data.
 	
 
-	public String getString(String xpath) throws X2DataException {
+	public String getString(String xpath) throws XDException {
 		Node current = null;
 		if (index < 0) {
 			// Before calling next() - use the first record.
@@ -76,7 +76,7 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	}
 
 	@Override
-	public boolean setCurrentIndex(int index) throws X2DataException {
+	public boolean setCurrentIndex(int index) throws XDException {
 		if (index >= 0 && index < list.getLength()) {
 			this.index = index;
 			return true;
@@ -95,15 +95,15 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterate over this object using a Java iterator
 
-	public Iterator<XSelectable> iterator() {
-		return new X2DataIterator(this);
+	public Iterator<XDSelector> iterator() {
+		return new XIterator(this);
 	}
 	
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select elements within this data object
 
-	public XSelectable select(String xpath) throws X2DataException {
+	public XDSelector select(String xpath) throws XDException {
 		Node node = getCurrentNode();
 		if (node == null)
 			return null;
@@ -114,14 +114,14 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select and iterate using a callback
 
-	public void foreach(String xpath, Object userData, XIteratorCallback callback) throws X2DataException {
+	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
 		DomXmlList list = this.getNodes(xpath);
 		for (int i = 0; list.next(); i++) {
 			callback.next(list, i, userData);
 		}		
 	}
 
-	public void foreach(String xpath, XIteratorCallback callback) throws X2DataException {
+	public void foreach(String xpath, XDCallback callback) throws XDException {
 		foreach(xpath, null, callback);
 	}
 
@@ -129,7 +129,7 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select and iterate using a Java iterator
 	
-	public Iterable<XSelectable> foreach(String xpath) throws X2DataException {
+	public Iterable<XDSelector> foreach(String xpath) throws XDException {
 		return getNodes(xpath);
 	}
 	
@@ -160,7 +160,7 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	 * @param xpath
 	 *            An XPath specifier.
 	 */
-	public DomXmlList getNodes(String xpath) throws X2DataException {
+	public DomXmlList getNodes(String xpath) throws XDException {
 		Node node = getCurrentNode();
 		if (node == null)
 			return null;
@@ -182,7 +182,7 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	}
 
 
-	public Node getNode(String xpath, int index2) throws X2DataException {
+	public Node getNode(String xpath, int index2) throws XDException {
 		Node node = getCurrentNode();
 		if (node == null)
 			return null;

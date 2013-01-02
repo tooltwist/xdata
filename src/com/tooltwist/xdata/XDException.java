@@ -1,9 +1,9 @@
 package com.tooltwist.xdata;
 
-public class X2DataException extends Exception {
+public class XDException extends Exception {
 	private static final long serialVersionUID = -2546614232592554711L;
 
-	public X2DataException(String string) {
+	public XDException(String string) {
 		super(string);
 	}
 

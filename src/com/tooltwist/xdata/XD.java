@@ -1,12 +1,12 @@
 package com.tooltwist.xdata;
 
 import java.io.InputStream;
-import com.tooltwist.xdata.X2DataType.PluginStyle;
+import com.tooltwist.xdata.XDSelectorType.PluginStyle;
 
-public class X2Data {
+public class XD {
 
 	//-----------------------------------------------------------------------------------------------------
-	//	Code related to a the types used in X2Data objects.
+	//	Code related to a the types used in XD objects.
 	//
 	private static boolean defaultsConfigured = false;
 	private static Object syncObject = new Object();
@@ -14,12 +14,12 @@ public class X2Data {
 	/**
 	 * A list of data types.
 	 * 
-	 * A few rules are required for this list, because the data in the X2Data instances is stored in a matching array.
+	 * A few rules are required for this list, because the data in the XD instances is stored in a matching array.
 	 * 	- the list must never get re-ordered.
 	 *  - types may NOT be removed from this list.
 	 *  - types must be added using registerType_internal, either directly or via registerType().
 	 */
-	private static X2DataType[] types = new X2DataType[6]; // Initial size
+	private static XDSelectorType[] types = new XDSelectorType[6]; // Initial size
 	
 	/**
 	 * The number of registered data types.
@@ -44,12 +44,12 @@ public class X2Data {
 		}
 	}
 	
-	public synchronized static void registerType(String type, X2DataType plugin) {
+	public synchronized static void registerType(String type, XDSelectorType plugin) {
 		checkDefaultsLoaded();
 		registerType_internal(type, plugin);
 	}
 	
-	private synchronized static void registerType_internal(String type, X2DataType plugin) {
+	private synchronized static void registerType_internal(String type, XDSelectorType plugin) {
 		
 		// Make sue this plugin knows it's type
 		plugin.setType(type);
@@ -57,7 +57,7 @@ public class X2Data {
 		// Make sure the type list is big enough to add another.
 		if (numTypes + 1 > types.length) {
 			int newSize = types.length + 10;
-			X2DataType[] newList = new X2DataType[newSize];
+			XDSelectorType[] newList = new XDSelectorType[newSize];
 			for (int i = 0; i < numTypes; i++) {
 				newList[i] = types[i];
 			}
@@ -95,11 +95,11 @@ public class X2Data {
 	}
 
 	//-----------------------------------------------------------------------------------------------------
-	//	Code related to a specific X2Data instance.
+	//	Code related to a specific XD instance.
 	
 	private Object[] dataForType = null;
 
-	public X2Data(String data) throws X2DataException {
+	public XD(String data) throws XDException {
 		checkDefaultsLoaded();
 		init();
 		
@@ -110,9 +110,9 @@ public class X2Data {
 	 * Try to find a document type that understands this object type.
 	 * 
 	 * @param object
-	 * @throws X2DataException
+	 * @throws XDException
 	 */
-	public X2Data(Object object) throws X2DataException {
+	public XD(Object object) throws XDException {
 		checkDefaultsLoaded();
 		init();
 		
@@ -131,19 +131,19 @@ public class X2Data {
 		}
 
 		if (typeIndex < 0)
-			throw new X2DataException("Could not determine data type");
+			throw new XDException("Could not determine data type");
 		
-		XSelectable selectable = types[typeIndex].objectToSelectable(this, object);
+		XDSelector selectable = types[typeIndex].objectToSelectable(this, object);
 		dataForType[typeIndex] = selectable;
 	}
 
-	public X2Data(InputStream is) throws X2DataException {
+	public XD(InputStream is) throws XDException {
 		// TODO Auto-generated constructor stub
 		//ZZZZZZZZZZZZZZ
 	}
 
 	/**
-	 * Initialize this specific X2Data object.
+	 * Initialize this specific XD object.
 	 * (not to be confused with initializing the types above) 
 	 */
 	private void init() {
@@ -151,7 +151,7 @@ public class X2Data {
 		dataForType = new Object[numTypes];
 	}
 
-	public String getString() throws X2DataException {
+	public String getString() throws XDException {
 		if (dataForType == null)
 			return null;
 		
@@ -191,15 +191,15 @@ public class X2Data {
 			dataForType[stringType] = string;
 			return string;
 		}
-		throw new X2DataException("Could not convert " + types[typeToConvertToString].getType() + " to a String");
+		throw new XDException("Could not convert " + types[typeToConvertToString].getType() + " to a String");
 	}
 	
-	public void setString(String string) throws X2DataException {
+	public void setString(String string) throws XDException {
 		
 		// Determine the data type
 		int typeIndex = detectType(string);
 		if (typeIndex < 0)
-			throw new X2DataException("Could not determine data type");
+			throw new XDException("Could not determine data type");
 		
 		// Clear out all other data, and set this data
 		for (int i = 0; i < numTypes && i < dataForType.length; i++) {
@@ -210,24 +210,24 @@ public class X2Data {
 		}
 	}
 
-	public XSelectable getSelector() throws X2DataException {
+	public XDSelector getSelector() throws XDException {
 		
 		// See if we already have data in a selectable format.
 		for (int i = 0; i < numTypes && i < dataForType.length; i++) {
-			X2DataType type = types[i];
+			XDSelectorType type = types[i];
 			Object object = dataForType[i];
 
 			if (object == null)
 				continue;
 			if (type.getDataFormat() == PluginStyle.SELECTABLE_OBJECT) {
 				// Have data, and it's a selectable
-				return (XSelectable) object;
+				return (XDSelector) object;
 			}
 		}
 		
 		// We don't have a selectable object already, so we need to create one from any string data we have.
 		for (int i = 0; i < numTypes && i < dataForType.length; i++) {
-			X2DataType type = types[i];
+			XDSelectorType type = types[i];
 			Object object = dataForType[i];
 
 			if (object == null)
@@ -240,7 +240,7 @@ public class X2Data {
 				String prefix = type.getPrimaryType() + "-";
 				int indexForSelectableData = -1;
 				for (int i2 = 0; i2 < dataForType.length; i2++) {
-					X2DataType type2 = types[i2];
+					XDSelectorType type2 = types[i2];
 					
 					// If this type selectable, and can it convert from the type of string we have?
 					// i.e. does it have the same primary type (json, xml, etc)
@@ -259,7 +259,7 @@ public class X2Data {
 					String dataInStringRepresentation = (String) dataForType[indexForStringData];
 					Object convertedObject = types[indexForSelectableData].stringToSelectable(this, dataInStringRepresentation);
 					dataForType[indexForSelectableData] = convertedObject;
-					return (XSelectable) convertedObject;
+					return (XDSelector) convertedObject;
 				}
 				
 				// We couldn't convert this type of string... try the next.
@@ -268,32 +268,32 @@ public class X2Data {
 		}
 		
 		// No conversion could be found
-		throw new X2DataUnknownConversionException("Could not convert to a selectable format");//ZZZZZ check message
+		throw new XDUnknownConversionException("Could not convert to a selectable format");//ZZZZZ check message
 	}
 
-	public XSelectable getSelector(String type) throws X2DataException {
+	public XDSelector getSelector(String type) throws XDException {
 		
 		// Check the requested type is actually selectable
 		int objectTypeIndex = typeIndex(type);
 		if (objectTypeIndex < 0)
-			throw new X2DataIncompatibleFormatException("Unknown format '" + type + "'.");
+			throw new XDIncompatibleFormatException("Unknown format '" + type + "'.");
 		if (types[objectTypeIndex].getDataFormat() != PluginStyle.SELECTABLE_OBJECT)
-			throw new X2DataIncompatibleFormatException("Format '" + type + "' is not a selectable format."); //ZZZZZ check message
+			throw new XDIncompatibleFormatException("Format '" + type + "' is not a selectable format."); //ZZZZZ check message
 		
 		// Do we already have the data in the required format?
 		if (dataForType[objectTypeIndex] != null)
-			return (XSelectable) dataForType[objectTypeIndex];
+			return (XDSelector) dataForType[objectTypeIndex];
 		
 		// We'll need to convert from the string version.
 		// Do we have the requested data type in it's string representation?
-		X2DataType objectType = types[objectTypeIndex];		
+		XDSelectorType objectType = types[objectTypeIndex];		
 		String stringTypeName = types[objectTypeIndex].getPrimaryType() + "-string";
 		int stringTypeIndex = typeIndex(stringTypeName);
 		if (dataForType[stringTypeIndex] != null) {
 			
 			// We have a string version of the data, so do a conversion to required selectable form.
 			String dataInStringRepresentation = (String) dataForType[stringTypeIndex];
-			XSelectable object = objectType.stringToSelectable(this, dataInStringRepresentation);
+			XDSelector object = objectType.stringToSelectable(this, dataInStringRepresentation);
 			dataForType[objectTypeIndex] = object;
 			return object;			
 		}
@@ -302,7 +302,7 @@ public class X2Data {
 		// We couldn't convert to this type of object from it's string format,
 		// so we'll need to convert from some other data format that we do have.
 		//ZZZZZ
-		throw new X2DataUnknownConversionException("Could not convert to '" + type + "' format");
+		throw new XDUnknownConversionException("Could not convert to '" + type + "' format");
 	}
 
 	/**
@@ -314,9 +314,9 @@ public class X2Data {
 	 * Note: this method is normally only ever called by a selector.
 	 * 
 	 * @param type
-	 * @throws X2DataIncompatibleFormatException 
+	 * @throws XDIncompatibleFormatException 
 	 */
-	public void invalidateAllSelectorsExcept(Object object) throws X2DataIncompatibleFormatException {
+	public void invalidateAllSelectorsExcept(Object object) throws XDIncompatibleFormatException {
 		for (int i = 0; i < numTypes; i++) {
 			Object stringOrObject = dataForType[i];
 			if (stringOrObject != object)

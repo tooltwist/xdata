@@ -2,12 +2,12 @@ package com.tooltwist.fastXml;
 
 import java.util.Iterator;
 
-import com.tooltwist.xdata.X2DataException;
-import com.tooltwist.xdata.X2DataIterator;
-import com.tooltwist.xdata.XIteratorCallback;
-import com.tooltwist.xdata.XSelectable;
+import com.tooltwist.xdata.XDException;
+import com.tooltwist.xdata.XIterator;
+import com.tooltwist.xdata.XDCallback;
+import com.tooltwist.xdata.XDSelector;
 
-public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
+public class FastXmlNodes implements XDSelector, Iterable<XDSelector> {
 	private static final int LIST_SIZE = 1024;
 
 	private int[] nodeNum = new int[LIST_SIZE];
@@ -114,13 +114,13 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 	// Methods for accessing data.
 
 	@Override
-	public String getString(String xpath) throws X2DataException {
+	public String getString(String xpath) throws XDException {
 		try {
 			String value = getText(xpath, 0);
 //			String value = getText(xpath);
 			return value;
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
@@ -222,7 +222,7 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 	}
 
 	@Override
-	public boolean setCurrentIndex(int index) throws X2DataException {
+	public boolean setCurrentIndex(int index) throws XDException {
 		
 		// Shuffle through the blocks and set the select pointer to the correct block and position.
 		if (index < 0)
@@ -257,15 +257,15 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterate over this object using a Java iterator
 	
-	public Iterator<XSelectable> iterator() {
-		return new X2DataIterator(this);
+	public Iterator<XDSelector> iterator() {
+		return new XIterator(this);
 	}
 
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select elements within this data object
 
-	public XSelectable select(String xpath) {
+	public XDSelector select(String xpath) {
 		return getNodes(xpath);
 	}
 
@@ -273,18 +273,18 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select and iterate using a callback
 
-	public void foreach(String xpath, XIteratorCallback callback) throws X2DataException {
+	public void foreach(String xpath, XDCallback callback) throws XDException {
 		foreach(xpath, callback, null);
 	}
 
-	public void foreach(String xpath, Object userData, XIteratorCallback callback) throws X2DataException {
+	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
 		try {
-			XSelectable list = this.getNodes(xpath);
+			XDSelector list = this.getNodes(xpath);
 			for (int index = 0; list.next(); index++) {
 				callback.next(list, index, userData);
 			}		
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
@@ -294,7 +294,7 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select and iterate using a Java iterator
 	
-	public Iterable<XSelectable> foreach(String xpath) throws X2DataException {
+	public Iterable<XDSelector> foreach(String xpath) throws XDException {
 		FastXmlNodes list = this.getNodes(xpath);
 		return list;
 	}

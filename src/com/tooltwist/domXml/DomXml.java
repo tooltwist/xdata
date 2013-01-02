@@ -32,33 +32,33 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.tooltwist.xdata.X2Data;
-import com.tooltwist.xdata.X2DataException;
-import com.tooltwist.xdata.X2DataNotFoundException;
-import com.tooltwist.xdata.XIteratorCallback;
-import com.tooltwist.xdata.XSelectable;
+import com.tooltwist.xdata.XD;
+import com.tooltwist.xdata.XDException;
+import com.tooltwist.xdata.XDNotFoundException;
+import com.tooltwist.xdata.XDCallback;
+import com.tooltwist.xdata.XDSelector;
 
-public class DomXml implements XSelectable, Iterable<XSelectable> {
+public class DomXml implements XDSelector, Iterable<XDSelector> {
 
 	private Document document;
 //	private PrefixResolverDefault prefixResolver;
 //	private XPathContext rootXpathContext = null;
 //	private int rootContextNode = -1;
-	private X2Data parentXD;
+	private XD parentXD;
 
-	public DomXml(X2Data parent, String xml) throws DomXmlException {
+	public DomXml(XD parent, String xml) throws DomXmlException {
 		this.parentXD = parent;
 		
 		init(xml.toCharArray());
 	}
 
-	public DomXml(X2Data parent, char xml[]) throws DomXmlException {
+	public DomXml(XD parent, char xml[]) throws DomXmlException {
 		this.parentXD = parent;
 		
 		init(xml);
 	}
 
-	public DomXml(X2Data parent, File file, boolean useUnicode) throws DomXmlException {
+	public DomXml(XD parent, File file, boolean useUnicode) throws DomXmlException {
 		this.parentXD = parent;
 
 		String path = file.getAbsolutePath();
@@ -259,7 +259,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            An XPath string to be matched.
 	 * @see getXpathNode
 	 */
-	public DomXmlList getNodes(String xpath) throws X2DataException {
+	public DomXmlList getNodes(String xpath) throws XDException {
 		NodeList nl = getNodeList(xpath);
 		return new DomXmlList(nl, this);
 	}
@@ -272,10 +272,10 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            An XPath string to be matched.
 	 * @param target
 	 *            A node from which to start matching the XPath.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 * @see getXpathNode
 	 */
-	public DomXmlList getNodes(String xpath, Node target) throws X2DataException {
+	public DomXmlList getNodes(String xpath, Node target) throws XDException {
 		NodeList nl = getNodeList(xpath, target);
 		return new DomXmlList(nl, this);
 	}
@@ -290,7 +290,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            Which node to return.
 	 * @see getXpathNode
 	 */
-	public NodeList getNodeList(String xpath) throws X2DataException {
+	public NodeList getNodeList(String xpath) throws XDException {
 //		if (traceName != null)
 //			logger.debug("XData[" + traceName + "].getNode(String xpath)");
 		try {
@@ -312,7 +312,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 			NodeList nl = _xpath.execute(xpathSupport, contextNode, prefixResolver).nodelist();
 			return nl;
 		} catch (TransformerException e) {
-			throw new X2DataNotFoundException("Error selecting xpath (" + xpath + ") from root: " + e);
+			throw new XDNotFoundException("Error selecting xpath (" + xpath + ") from root: " + e);
 		}
 	}
 
@@ -328,7 +328,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	public NodeList getNodeList(String xpath, Node target) throws X2DataException {
+	public NodeList getNodeList(String xpath, Node target) throws XDException {
 		try {
 			// XPathContext xpathSupport = new XPathContext();
 			
@@ -347,7 +347,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 			NodeList nl = _xpath.execute(xpathSupport, contextNode, prefixResolver).nodelist();
 			return nl;
 		} catch (TransformerException e) {
-			throw new X2DataException("Error selecting xpath (" + xpath + ") below specified node: " + e);
+			throw new XDException("Error selecting xpath (" + xpath + ") below specified node: " + e);
 		}
 	}
 
@@ -395,30 +395,30 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            An XPath string to be matched.
 	 * @param target
 	 *            The place from which to start the search.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 * @see getXpathNodeList
 	 */
-	public String getText(String xpath, Node target) throws X2DataException {
+	public String getText(String xpath, Node target) throws XDException {
 		NodeList nl = getNodeList(xpath, target);
 		return getTextFromNodeList(nl);
 	}
 
 
 	//--------------------------------------------------------------------------------------------------------------------
-	// Methods for the XSelectable interface
+	// Methods for the XDSelector interface
 
 	@Override
-	public String getString(String xpath) throws X2DataException {
+	public String getString(String xpath) throws XDException {
 		NodeList nl = getNodeList(xpath);
 		String text = getTextFromNodeList(nl);
 		return text;
 	}
 
 //	@Override
-//	public String getString(String xpath, int index) throws X2DataException {
+//	public String getString(String xpath, int index) throws XDException {
 //		NodeList nl = getNodeList(xpath);
 //		if (index < 0 || index >= nl.getLength())
-//			throw new X2DataException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+//			throw new XDException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
 //		Node node = nl.item(index);
 //		String string = getString(node);
 //		return string;
@@ -434,7 +434,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	}
 
 	@Override
-	public Iterator<XSelectable> iterator() {
+	public Iterator<XDSelector> iterator() {
 		return null;
 	}
 
@@ -475,7 +475,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	}
 
 	@Override
-	public boolean setCurrentIndex(int index) throws X2DataException {
+	public boolean setCurrentIndex(int index) throws XDException {
 		if (index == 0)
 			return true;
 		return false;
@@ -509,33 +509,33 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Selections relative to this object, using an xpath.
 	
-	public XSelectable select(String xpath) throws X2DataException {
+	public XDSelector select(String xpath) throws XDException {
 		NodeList nl = getNodeList(xpath);
 		return new DomXmlList(nl, this);
 	}
 
-	public void foreach(String xpath, Object userData, XIteratorCallback callback) throws X2DataException {
+	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
 		try {
-			XSelectable list = this.getNodes(xpath);
+			XDSelector list = this.getNodes(xpath);
 			for (int index = 0; list.next(); index++) {
 				callback.next(list, index, userData);
 			}		
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
 	}
 
-	public void foreach(String xpath, XIteratorCallback callback) throws X2DataException {
+	public void foreach(String xpath, XDCallback callback) throws XDException {
 		foreach(xpath, null, callback);
 	}
 
-	public Iterable<XSelectable> foreach(String xpath) throws X2DataException {
+	public Iterable<XDSelector> foreach(String xpath) throws XDException {
 		try {
 			return getNodes(xpath);
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
@@ -544,15 +544,15 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods specific to manipulating the DOM.
-	// i.e. non-XSelectable methods
+	// i.e. non-XDSelector methods
 
-	public DomXml(X2Data parent, Document document) {
+	public DomXml(XD parent, Document document) {
 		this.parentXD = parent;
 
 		this.document = document;
 	}
 
-	public DomXml(X2Data parent, Node node) throws DomXmlException {
+	public DomXml(XD parent, Node node) throws DomXmlException {
 		this.parentXD = parent;
 
 		try {
@@ -596,15 +596,15 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 		return s;
 	}
 
-	public void notifyDocumentChanged() throws X2DataException {
+	public void notifyDocumentChanged() throws XDException {
 		parentXD.invalidateAllSelectorsExcept(this);
 	}
 
-	public void insert(Node root, String xpath, X2Data xd) throws X2DataException {
+	public void insert(Node root, String xpath, XD xd) throws XDException {
 		// Check that the tag exists
 		Node parent = checkElementExists(root, xpath);
 		if (parent == null || !(parent instanceof Element))
-			throw new X2DataException("xpath does not resolve to an Element: " + xpath);
+			throw new XDException("xpath does not resolve to an Element: " + xpath);
 
 		createChild((Element) parent, xd);
 		notifyDocumentChanged();
@@ -614,7 +614,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * Find the node that matches a specified XPATH, starting at <code>root</code>.
 	 * If no suitable node can be found, create a new element.
 	 */
-	private Node checkElementExists(Node root, String xpath) throws X2DataException {
+	private Node checkElementExists(Node root, String xpath) throws XDException {
 //		if (traceName != null)
 //			logger.debug("XData[" + traceName + "].checkElementExists(Node root, xpath=" + xpath + ")");
 
@@ -636,7 +636,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 
 			// The node does not exist - check the parent exists, then add a new child
 			if (xpath.endsWith("//"))
-				throw new X2DataException("Cannot create xpath - " + xpath);
+				throw new XDException("Cannot create xpath - " + xpath);
 			int pos = xpath.lastIndexOf('/');
 			String parentXpath = (pos >= 0) ? xpath.substring(0, pos) : null;
 			String childName = (pos >= 0) ? xpath.substring(pos + 1) : xpath;
@@ -644,9 +644,9 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 
 			// If the child name has special xpath characters then we can't create it
 			if (childName.length() == 0)
-				throw new X2DataException("Cannot create xPath - " + xpath + " - no child directory specified");
+				throw new XDException("Cannot create xPath - " + xpath + " - no child directory specified");
 			if (childName.indexOf("[") >= 0 || childName.indexOf("]") >= 0)
-				throw new X2DataException("Cannot create xPath - " + xpath + " - wildcard characters in name");
+				throw new XDException("Cannot create xPath - " + xpath + " - wildcard characters in name");
 
 			// Get the parent, then add the new child
 			Node parent = (parentXpath == null) ? root : checkElementExists(root, parentXpath);
@@ -655,25 +655,25 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 				child = parent.getOwnerDocument().createElement(childName);
 			} catch (org.w3c.dom.DOMException e) {
 				if (childName.indexOf(" ") >= 0 || childName.indexOf("\t") >= 0 || childName.indexOf("\n") >= 0 || childName.indexOf("\r") >= 0)
-					throw new X2DataException("Cannot creat node with spaces in the name (" + childName + ")");
-				throw new X2DataException("Cannot create new node named '" + childName + "'");
+					throw new XDException("Cannot creat node with spaces in the name (" + childName + ")");
+				throw new XDException("Cannot create new node named '" + childName + "'");
 			}
 			parent.appendChild(child);
 
 			notifyDocumentChanged();
 			return child;
 		} catch (TransformerException e) {
-			throw new X2DataException("Error selecting text from document: " + e);
+			throw new XDException("Error selecting text from document: " + e);
 		}
 	}
 
 	/**
 	 * Insert the contents of an XData document under an existing node. The <code>parent<code> element must
 	 * not be in the document within the <code>data</code> parameter.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 */
-	public static void createChild(Element parent, X2Data data) throws X2DataException {
-		XSelectable selector = data.getSelector("xml-dom");
+	public static void createChild(Element parent, XD data) throws XDException {
+		XDSelector selector = data.getSelector("xml-dom");
 		DomXml domXml = (DomXml) selector;
 		Node node = domXml.document.getDocumentElement();
 		Document doc = parent.getOwnerDocument();
@@ -681,11 +681,11 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 		parent.appendChild(newNode);
 	}
 
-	public void insert(Node root, String xpath, Node childNode) throws X2DataException {
+	public void insert(Node root, String xpath, Node childNode) throws XDException {
 		// Check that the tag exists
 		Node parent = checkElementExists(root, xpath);
 		if (parent == null || !(parent instanceof Element))
-			throw new X2DataException("XData.createChild: xpath does not resolve to an Element");
+			throw new XDException("XData.createChild: xpath does not resolve to an Element");
 
 		createChild((Element) parent, childNode);
 		notifyDocumentChanged();
@@ -807,10 +807,10 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * @param destinationIndex
 	 * @param sourceXml
 	 * @param sourcePath
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 * @throws XDataException
 	 */
-	public void insert(String destinationXpath, int destinationIndex, X2Data sourceXml, String sourcePath) throws X2DataException {
+	public void insert(String destinationXpath, int destinationIndex, XD sourceXml, String sourcePath) throws XDException {
 		// Copy the input to this module into the exitData element (used to return from the linked module)
 		Node destinationNode = this.getNode(destinationXpath, destinationIndex);
 		
@@ -834,13 +834,13 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            An XPath string to be matched.
 	 * @param index
 	 *            Which node to return.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 * @see getXpathNode
 	 */
-	public Node getNode(String xpath, int index) throws X2DataException {
+	public Node getNode(String xpath, int index) throws XDException {
 		NodeList nodeList = getNodeList(xpath);
 		if (index < 0 || index >= nodeList.getLength())
-			throw new X2DataNotFoundException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+			throw new XDNotFoundException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
 		return nodeList.item(index);
 	}
 
@@ -855,13 +855,13 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            Which node to return.
 	 * @param target
 	 *            The place from which to start the search.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 * @see getXpathNodeList
 	 */
-	public Node getNode(String xpath, Node target, int index) throws X2DataException {
+	public Node getNode(String xpath, Node target, int index) throws XDException {
 		NodeList nl = getNodeList(xpath, target);
 		if (index < 0 || index >= nl.getLength())
-			throw new X2DataException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+			throw new XDException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
 		return nl.item(index);
 	}
 
@@ -874,7 +874,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * @param childNode
 	 *            The new node to be added.
 	 */
-	public void insert(String xpath, Node childNode) throws X2DataException {
+	public void insert(String xpath, Node childNode) throws XDException {
 		// Check that the tag exists
 		Node root = document.getDocumentElement();
 		insert(root, xpath, childNode);
@@ -882,9 +882,9 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 
 	/**
 	 * Replace the text value of a node within the XML.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 */
-	public void replace(String xpath, String value) throws X2DataException {
+	public void replace(String xpath, String value) throws XDException {
 		// Check that the tag exists
 		Node root = document.getDocumentElement();
 		replace(root, xpath, value);
@@ -892,9 +892,9 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 
 	/**
 	 * Replace the a node within an XML document with a node from another document.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 */
-	public void replace(String xpath, X2Data sourceData, String srcXpath) throws X2DataException {
+	public void replace(String xpath, XD sourceData, String srcXpath) throws XDException {
 		// Find the node in the source
 		DomXml domXml = (DomXml) sourceData.getSelector("xml-dom");
 		Document srcDoc = domXml.getDocument();
@@ -927,9 +927,9 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            Position of the node to be replaced.
 	 * @param value
 	 *            If null, the node is removed, not replaced.
-	 * @throws X2DataException
+	 * @throws XDException
 	 */
-	public void replace(Node root, String xpath, String value) throws X2DataException {
+	public void replace(Node root, String xpath, String value) throws XDException {
 		// Check that the tag exists
 		Node parent = checkElementExists(root, xpath);
 
@@ -950,7 +950,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	}
 
 	/**
-	 * Insert all the nodes within another X2Data object into this X2Data object. Extra nodes will be added to create the
+	 * Insert all the nodes within another XD object into this XD object. Extra nodes will be added to create the
 	 * parent if required.
 	 * 
 	 * @param xpath
@@ -958,7 +958,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * @param data
 	 *            The document to be inserted.
 	 */
-	public void insert(String xpath, X2Data xd) throws X2DataException {
+	public void insert(String xpath, XD xd) throws XDException {
 		// Check that the tag exists
 		Node root = document.getDocumentElement();
 		insert(root, xpath, xd);
@@ -979,9 +979,9 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * 		Fields within the element that will be used to determine the ordering.
 	 * @param isAscending
 	 * 		Sort in increasing or decreasing order.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 */
-	public void sortElements(String parentXPath, String elementName, String sortFields, boolean isAscending) throws X2DataException {
+	public void sortElements(String parentXPath, String elementName, String sortFields, boolean isAscending) throws XDException {
 		if (elementName == null || elementName.equals("")) {
 			int index = parentXPath.lastIndexOf("/");
 			if (index < 0) {
@@ -1087,7 +1087,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	public String getString(String xpath, Node target) throws X2DataException {
+	public String getString(String xpath, Node target) throws XDException {
 		NodeList nl = getNodeList(xpath, target);
 		return getTextFromNodeList(nl);
 	}
@@ -1100,10 +1100,10 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            An XPath string to be matched.
 	 * @param target
 	 *            The place from which to start the search.
-	 * @throws X2DataException 
+	 * @throws XDException 
 	 * @see getXpathNodeList
 	 */
-	public String getString(String xpath, Node target, int index) throws X2DataException {
+	public String getString(String xpath, Node target, int index) throws XDException {
 		try {
 			XPathContext xpathSupport = new XPathContext();
 			// XPathContext xpathSupport = hidden.getRootXPathContext(); ZZZZZZZZZ This might be better
@@ -1116,12 +1116,12 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 			NodeList nl = _xpath.execute(xpathSupport, contextNode, prefixResolver).nodelist();
 
 			if (index < 0 || index >= nl.getLength())
-				throw new X2DataException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+				throw new XDException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
 			Node node = nl.item(index);
 			String string = getText(node);
 			return string;
 		} catch (TransformerException e) {
-			throw new X2DataException("Error selecting text from document: " + e);
+			throw new XDException("Error selecting text from document: " + e);
 		}
 	}
 
@@ -1145,7 +1145,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
 	        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
 	        if (impl == null)
-	            throw new X2DataException("No DOMImplementation found.");
+	            throw new XDException("No DOMImplementation found.");
 			
 			LSSerializer serializer = impl.createLSSerializer();
 //	        LSOutput output = impl.createLSOutput();
@@ -1171,7 +1171,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 		        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
 		        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
 		        if (impl == null)
-		            throw new X2DataException("No DOMImplementation found.");
+		            throw new XDException("No DOMImplementation found.");
 				
 				LSSerializer serializer = impl.createLSSerializer();
 //		        LSOutput output = impl.createLSOutput();

@@ -2,7 +2,7 @@ package com.tooltwist.xdata;
 
 import com.tooltwist.fastJson.FastJson;
 
-public class X2FastJson extends X2DataType {
+public class X2FastJson extends XDSelectorType {
 
 	@Override
 	public PluginStyle getDataFormat() {
@@ -31,17 +31,17 @@ public class X2FastJson extends X2DataType {
 	}
 
 	@Override
-	public XSelectable objectToSelectable(X2Data parentXd, Object object) throws X2DataException {
+	public XDSelector objectToSelectable(XD parentXd, Object object) throws XDException {
 		return null;
 	}
 	
 	@Override
-	public XSelectable stringToSelectable(X2Data parentXd, String string) throws X2DataException {
+	public XDSelector stringToSelectable(XD parentXd, String string) throws XDException {
 		FastJson fastJson;
 		try {
 			fastJson = new FastJson(string);
 		} catch (Exception e) {
-			X2DataException exception = new X2DataException(e.getMessage());
+			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
@@ -49,13 +49,13 @@ public class X2FastJson extends X2DataType {
 	}
 
 	@Override
-	public String selectableToString(Object object) throws X2DataException {
+	public String selectableToString(Object object) throws XDException {
 		if (object instanceof FastJson) {
 			FastJson fastXml = (FastJson) object;
 			String string = fastXml.toString();
 			return string;
 		}
-		throw new X2DataException("Internal error: object is not " + FastJson.class.getName());
+		throw new XDException("Internal error: object is not " + FastJson.class.getName());
 	}
 
 }
