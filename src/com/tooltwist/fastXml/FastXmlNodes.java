@@ -2,7 +2,6 @@ package com.tooltwist.fastXml;
 
 import java.util.Iterator;
 
-import com.tooltwist.xdata.X2Data;
 import com.tooltwist.xdata.X2DataException;
 import com.tooltwist.xdata.X2DataIterator;
 import com.tooltwist.xdata.XIteratorCallback;

@@ -1,11 +1,6 @@
 package com.tooltwist.xdata;
 
 import java.io.InputStream;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.tooltwist.xdata.X2DataType.PluginStyle;
 
 public class X2Data {

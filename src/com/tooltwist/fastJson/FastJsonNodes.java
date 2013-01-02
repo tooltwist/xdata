@@ -5,8 +5,6 @@ import java.util.Iterator;
 import com.tooltwist.fastJson.FastJson;
 import com.tooltwist.fastJson.FastJsonException;
 import com.tooltwist.fastJson.FastJsonNodes;
-import com.tooltwist.fastXml.FastXmlNodes;
-import com.tooltwist.xdata.X2Data;
 import com.tooltwist.xdata.X2DataException;
 import com.tooltwist.xdata.X2DataIterator;
 import com.tooltwist.xdata.XIteratorCallback;

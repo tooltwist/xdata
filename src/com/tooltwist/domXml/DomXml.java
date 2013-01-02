@@ -1,6 +1,5 @@
 package com.tooltwist.domXml;
 
-import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,11 +15,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
-//import javax.xml.parsers.DocumentBuilder;
-//import javax.xml.parsers.DocumentBuilderFactory;
-//import javax.xml.parsers.ParserConfigurationException;
-//import javax.xml.transform.TransformerException;
 
 import org.apache.xml.utils.PrefixResolver;
 import org.apache.xml.utils.PrefixResolverDefault;
@@ -851,7 +845,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	}
 
 	/**
-	 * Get a node that matches a specified XPATH below a specifed starting point. This method returns the index'th node
+	 * Get a node that matches a specified XPATH below a specified starting point. This method returns the index'th node
 	 * that matches the provided XPath. If no suitable node can be found, return null.
 	 * 
 	 * @return The index'th nodes that matches the specified XPath.

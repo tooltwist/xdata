@@ -11,7 +11,6 @@ import java.util.Vector;
 import com.tooltwist.fastJson.FastJsonBlockOfNodes;
 import com.tooltwist.fastJson.FastJsonException;
 import com.tooltwist.fastJson.FastJsonNodes;
-import com.tooltwist.xdata.X2Data;
 import com.tooltwist.xdata.X2DataException;
 import com.tooltwist.xdata.X2DataIterator;
 import com.tooltwist.xdata.XIteratorCallback;

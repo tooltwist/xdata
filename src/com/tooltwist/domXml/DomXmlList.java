@@ -5,7 +5,6 @@ import java.util.Iterator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.tooltwist.xdata.X2Data;
 import com.tooltwist.xdata.X2DataException;
 import com.tooltwist.xdata.X2DataIterator;
 import com.tooltwist.xdata.XIteratorCallback;
@@ -16,7 +15,6 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	private NodeList list;
 	private DomXml xmlData;	// only used to get the XPath values
 	private int index = -1;	// Current index in this linked list
-	private X2Data parentXD;
 
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods for accessing data.
@@ -181,6 +179,14 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 		if (index >= 0 && index < list.getLength())
 			return list.item(index);
 		return null;
+	}
+
+
+	public Node getNode(String xpath, int index2) throws X2DataException {
+		Node node = getCurrentNode();
+		if (node == null)
+			return null;
+		return xmlData.getNode(xpath, node, index);
 	}
 
 
