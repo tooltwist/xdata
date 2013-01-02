@@ -1,5 +1,6 @@
 package com.tooltwist.domXml;
 
+import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,7 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,6 +26,7 @@ import org.apache.xml.utils.PrefixResolver;
 import org.apache.xml.utils.PrefixResolverDefault;
 import org.apache.xpath.XPath;
 import org.apache.xpath.XPathContext;
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -43,9 +47,9 @@ import com.tooltwist.xdata.XSelectable;
 public class DomXml implements XSelectable, Iterable<XSelectable> {
 
 	private Document document;
-	private PrefixResolverDefault prefixResolver;
-	private XPathContext rootXpathContext = null;
-	private int rootContextNode = -1;
+//	private PrefixResolverDefault prefixResolver;
+//	private XPathContext rootXpathContext = null;
+//	private int rootContextNode = -1;
 	private X2Data parentXD;
 
 	public DomXml(X2Data parent, String xml) throws DomXmlException {
@@ -136,8 +140,8 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 			document = db.parse(is);
 
 			// Remove the xpath processing structures, so they'll be recreated for the new document
-			prefixResolver = null;
-			rootContextNode = -1;
+//			prefixResolver = null;
+//			rootContextNode = -1;
 			
 //	        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
 //	        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
@@ -191,43 +195,20 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	public PrefixResolver getPrefixResolver() {
-
-		//zzzzz
-		 prefixResolver = null;
-
-		// Check the document is up to date (which may remove prefixResolver and parentContextNode)
-		if (this.prefixResolver == null) {
-
-//XXXX			getDocument(); // check there is a current document object
-			prefixResolver = new PrefixResolverDefault(document.getDocumentElement());
-		}
-		return prefixResolver;
-	}
-
-	/**
-	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point.
-	 * 
-	 * @return The text contained in the first node that matches the specified XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
-	 * @param target
-	 *            The place from which to start the search.
-	 * @see getXpathNodeList
-	 */
-	public int getRootContextNode() {
-//zzzzzzz
-rootContextNode = -1;
-
-		if (rootContextNode >= 0)
-			return rootContextNode;
-
-		// Check we have a DOM document, and an XPathContext for the document
-//		getDocument();
-		getRootXPathContext();
-		rootContextNode = rootXpathContext.getDTMHandleFromNode(document.getDocumentElement());
-		return rootContextNode;
-	}
+//	public PrefixResolver getPrefixResolver() {
+//
+//		//zzzzz
+//		 prefixResolver = null;
+//
+//		// Check the document is up to date (which may remove prefixResolver and parentContextNode)
+//		if (this.prefixResolver == null) {
+//
+////XXXX			getDocument(); // check there is a current document object
+//			prefixResolver = new PrefixResolverDefault(document.getDocumentElement());
+//		}
+//		return prefixResolver;
+//return null;
+//	}
 
 	/**
 	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point.
@@ -239,18 +220,42 @@ rootContextNode = -1;
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	public XPathContext getRootXPathContext() {
-		
-		//zzzzzz
-		//rootXpathContext = null;
+//	public int getRootContextNode() {
+////zzzzzzz
+//rootContextNode = -1;
+//
+//		if (rootContextNode >= 0)
+//			return rootContextNode;
+//
+//		// Check we have a DOM document, and an XPathContext for the document
+////		getDocument();
+//		getRootXPathContext();
+//		rootContextNode = rootXpathContext.getDTMHandleFromNode(document.getDocumentElement());
+//		return rootContextNode;
+//	}
 
-		if (rootXpathContext != null)
-			return rootXpathContext;
-
-		// Check we have a DOM document, and an XPathContext for the document
-		rootXpathContext = new XPathContext();
-		return rootXpathContext;
-	}
+	/**
+	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point.
+	 * 
+	 * @return The text contained in the first node that matches the specified XPath.
+	 * @param xpath
+	 *            An XPath string to be matched.
+	 * @param target
+	 *            The place from which to start the search.
+	 * @see getXpathNodeList
+	 */
+//	public XPathContext getRootXPathContext() {
+//		
+//		//zzzzzz
+//		//rootXpathContext = null;
+//
+//		if (rootXpathContext != null)
+//			return rootXpathContext;
+//
+//		// Check we have a DOM document, and an XPathContext for the document
+//		rootXpathContext = new XPathContext();
+//		return rootXpathContext;
+//	}
 
 	/**
 	 * Get a list of nodes that match the specified XPATH.
@@ -295,9 +300,18 @@ rootContextNode = -1;
 //		if (traceName != null)
 //			logger.debug("XData[" + traceName + "].getNode(String xpath)");
 		try {
-			PrefixResolver prefixResolver = getPrefixResolver();
-			XPathContext xpathSupport = getRootXPathContext();
-			int contextNode = getRootContextNode();
+			//PrefixResolver prefixResolver = getPrefixResolver();
+			PrefixResolver prefixResolver = new PrefixResolverDefault(document.getDocumentElement());
+			
+			//cccc
+			//XPathContext xpathSupport = getRootXPathContext();
+			XPathContext xpathSupport = new XPathContext();
+
+			//cccc
+			//int contextNode = getRootContextNode();
+			//getRootXPathContext();
+			int contextNode = xpathSupport.getDTMHandleFromNode(document.getDocumentElement());
+
 
 			// Select the list of nodes
 			XPath _xpath = new XPath(xpath, null, prefixResolver, XPath.SELECT, null);
@@ -323,7 +337,11 @@ rootContextNode = -1;
 	public NodeList getNodeList(String xpath, Node target) throws X2DataException {
 		try {
 			// XPathContext xpathSupport = new XPathContext();
-			XPathContext xpathSupport = getRootXPathContext(); // ZZZZZZZZZ This might be better
+			
+			//ccccc
+			//XPathContext xpathSupport = getRootXPathContext(); // ZZZZZZZZZ This might be better
+			XPathContext xpathSupport = new XPathContext();
+
 
 			Node node = (target.getNodeType() == Node.DOCUMENT_NODE) ? ((Document) target).getDocumentElement() : target;
 			PrefixResolverDefault prefixResolver = new PrefixResolverDefault(node);
@@ -560,37 +578,7 @@ rootContextNode = -1;
 			 throw new DomXmlException("Error contructing XData: " + e);
 		 }
 	}
-	
-
-
-	public String getXml() {
-		try {
-//			ByteArrayOutputStream os = new ByteArrayOutputStream();
-//			XMLSerializer ser = new XMLSerializer(os, null);
-//			ser.serialize(document);
-			
-	        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
-	        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
-	        if (impl == null)
-	            throw new X2DataException("No DOMImplementation found.");
-
-	        //System.out.printf("DOMImplementationLS: %s\n", impl.getClass().getName());
-
-			
-			LSSerializer serializer = impl.createLSSerializer();
-//	        LSOutput output = impl.createLSOutput();
-//	        output.setEncoding("UTF-8");
-//	        output.setByteStream(System.out);
-//	        serializer.write(document, output);
-//	        System.out.println();
-	        
-	        String string = serializer.writeToString(document);
-			return string;
-		} catch (Exception e) {
-			return "<error>Could not Serialize DOM Document</error>";
-		}
-	}
-	
+		
 	/**
 	 * Recursively get the text within a specified DOM node. This method does not return XML - it returns all the text
 	 * within the node and it's children.
@@ -980,6 +968,238 @@ rootContextNode = -1;
 		// Check that the tag exists
 		Node root = document.getDocumentElement();
 		insert(root, xpath, xd);
+	}
+
+	/**
+	 * Sort the elements in this data. The <i>xPath</i> parameter is the path to the element to be sorted. The sortFields
+	 * parameter specifies the value(s) used to specify the sort order. This <i>SortFields</i> may contain multiple
+	 * element names, separated by semicolons. A '#' before a name indicates that it should be treated as numeric.
+	 * <p>
+	 * Note that this method will force conversion to 'xml-dom', with the associated cost of parsing, etc. 
+	 * 
+	 * @param parentXPath
+	 * 		The element above the elements that will be sorted.
+	 * @param elementName
+	 * 		The name of the elements to be sorted.
+	 * @param sortFields
+	 * 		Fields within the element that will be used to determine the ordering.
+	 * @param isAscending
+	 * 		Sort in increasing or decreasing order.
+	 * @throws X2DataException 
+	 */
+	public void sortElements(String parentXPath, String elementName, String sortFields, boolean isAscending) throws X2DataException {
+		if (elementName == null || elementName.equals("")) {
+			int index = parentXPath.lastIndexOf("/");
+			if (index < 0) {
+				elementName = parentXPath;
+				parentXPath = null;
+			} else {
+				elementName = parentXPath.substring(index + 1);
+				parentXPath = parentXPath.substring(0, index);
+			}
+		}
+		if (parentXPath == null || parentXPath.equals(""))
+			parentXPath = "/*";
+
+		// Break the sort field string into separate parts
+		Vector<String> sortFieldsList = new Vector<String>();
+		String str = sortFields;
+		for (;;) {
+			int pos = str.indexOf(";");
+			if (pos < 0) {
+				sortFieldsList.add(str.trim());
+				break;
+			}
+			String part = str.substring(0, pos).trim();
+			if (!part.equals(""))
+				sortFieldsList.add(part);
+			str = str.substring(pos + 1);
+		}
+		int numSortFields = sortFieldsList.size();
+		String[] sortFieldNames = new String[numSortFields];
+		boolean isNumeric[] = new boolean[numSortFields];
+		for (int i = 0; i < numSortFields; i++) {
+			String s = (String) sortFieldsList.elementAt(i);
+			if (s.startsWith("#")) {
+				isNumeric[i] = true;
+				sortFieldNames[i] = s.substring(1).trim();
+			} else {
+				isNumeric[i] = false;
+				sortFieldNames[i] = s;
+			}
+		}
+
+		// Find all the parent nodes
+		DomXmlList parents = this.getNodes(parentXPath);
+		while (parents.next()) {
+			Node parentNode = parents.getCurrentNode();
+			DomXmlList children = parents.getNodes(elementName);
+			Vector<DomXmlSortElement> elements = new Vector<DomXmlSortElement>(); // vector of SortNode
+			while (children.next()) {
+
+				Node childNode = children.getCurrentNode();
+				Object sortValues[] = new Object[numSortFields];
+				for (int i = 0; i < numSortFields; i++) {
+					sortValues[i] = children.getString(sortFieldNames[i]);
+					if (isNumeric[i]) {
+						Long numericValue;
+						try {
+							numericValue = new Long((String) sortValues[i]);
+						} catch (NumberFormatException e) {
+							numericValue = new Long(Long.MIN_VALUE);
+						}
+						sortValues[i] = numericValue;
+					}
+				}
+				DomXmlSortElement element = new DomXmlSortElement(childNode, sortValues, isAscending);
+				elements.addElement(element);
+				/*
+				 * String stringVal = children.getText(sortFieldXPath); if (sortFieldIsInteger) { long val; try { val =
+				 * Long.parseLong(stringVal); } catch (NumberFormatException e) { val = Long.MIN_VALUE; }
+				 * XDataIntegerSortElement element = new XDataIntegerSortElement(childNode, val, isAscending);
+				 * elements.addElement(element); } else { XDataStringSortElement element = new
+				 * XDataStringSortElement(childNode, stringVal, isAscending); elements.addElement(element); } //String
+				 * name = children.getText("name"); //logger.debug("name = " + name + ", sequence=" + stringVal);
+				 */
+
+				// Delete the child from the parent
+				parentNode.removeChild(childNode);
+				this.notifyDocumentChanged();
+			}
+
+			// Sort the list
+			Collections.sort(elements);
+
+			// Add the elements back to their parent
+			for (int i = 0; i < elements.size(); i++) {
+				DomXmlSortElement rec = (DomXmlSortElement) elements.elementAt(i);
+				Node childNode = rec.getNode();
+				// String str = XData.getText(childNode);
+				// logger.debug("node is " + str);
+				// parentNode.appendChild(childNode);
+				createChild((Element) parentNode, childNode);
+				this.notifyDocumentChanged();
+			}
+		}
+	}
+
+	/**
+	 * Return the value of the first node that matches a specified XPATH below the element specified by <code>target</code>.
+	 * 
+	 * @return The text contained in the first node that matches the specified XPath.
+	 * @param xpath
+	 *            An XPath string to be matched.
+	 * @param target
+	 *            The place from which to start the search.
+	 * @see getXpathNodeList
+	 */
+	public String getString(String xpath, Node target) throws X2DataException {
+		NodeList nl = getNodeList(xpath, target);
+		return getTextFromNodeList(nl);
+	}
+
+	/**
+	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point.
+	 * 
+	 * @return The text contained in the first node that matches the specified XPath.
+	 * @param xpath
+	 *            An XPath string to be matched.
+	 * @param target
+	 *            The place from which to start the search.
+	 * @throws X2DataException 
+	 * @see getXpathNodeList
+	 */
+	public String getString(String xpath, Node target, int index) throws X2DataException {
+		try {
+			XPathContext xpathSupport = new XPathContext();
+			// XPathContext xpathSupport = hidden.getRootXPathContext(); ZZZZZZZZZ This might be better
+
+			target = (target.getNodeType() == Node.DOCUMENT_NODE) ? ((Document) target).getDocumentElement() : target;
+			PrefixResolver prefixResolver = new PrefixResolverDefault(target);
+			int contextNode = xpathSupport.getDTMHandleFromNode(target);
+
+			XPath _xpath = new XPath(xpath, null, prefixResolver, XPath.SELECT, null);
+			NodeList nl = _xpath.execute(xpathSupport, contextNode, prefixResolver).nodelist();
+
+			if (index < 0 || index >= nl.getLength())
+				throw new X2DataException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+			Node node = nl.item(index);
+			String string = getText(node);
+			return string;
+		} catch (TransformerException e) {
+			throw new X2DataException("Error selecting text from document: " + e);
+		}
+	}
+
+	/**
+	 * Return a string representation of this XML document.
+	 */
+	public String getXml() {
+		String string = DomXml.domToXml(this.document);
+		return string;
+	}
+
+	/**
+	 * Convert a DOM document object to XML.
+	 * 
+	 * @param document
+	 * @return
+	 * 	String representation of the XML document.
+	 */
+	public static String domToXml(Document document) {
+		try {
+	        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
+	        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
+	        if (impl == null)
+	            throw new X2DataException("No DOMImplementation found.");
+			
+			LSSerializer serializer = impl.createLSSerializer();
+//	        LSOutput output = impl.createLSOutput();
+//	        output.setEncoding("UTF-8");
+//	        output.setByteStream(System.out);
+//	        serializer.write(document, output);
+//	        System.out.println();
+	        
+	        String string = serializer.writeToString(document);
+			return string;
+		} catch (Exception e) {
+			return "<error>Could not Serialize DOM Document</error>";
+		}
+	}
+
+	/**
+	 * Return the string representation of a DOM XML node.
+	 */
+	public static String domToXml(Node node) {
+		try {
+			if (node instanceof Element) {
+				Element elem = (Element) node;
+		        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
+		        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
+		        if (impl == null)
+		            throw new X2DataException("No DOMImplementation found.");
+				
+				LSSerializer serializer = impl.createLSSerializer();
+//		        LSOutput output = impl.createLSOutput();
+//		        output.setEncoding("UTF-8");
+//		        output.setByteStream(System.out);
+//		        serializer.write(document, output);
+//		        System.out.println();
+		        
+		        String string = serializer.writeToString(elem);
+				return string;
+
+			} else if (node instanceof Text) {
+				Text text = (Text) node;
+				return text.getNodeValue();
+			} else if (node instanceof CDATASection) {
+				CDATASection cdata = (CDATASection) node;
+				return cdata.getNodeValue();
+			} else
+				return "";
+		} catch (Exception e) {
+			return "<error>Could not Serialize DOM Element</error>";
+		}
 	}
 
 }

@@ -148,7 +148,7 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 		this.xmlData = domXml;
 	}
 	
-	private Node getCurrentNode() {
+	public Node getCurrentNode() {
 		if (index >= 0 && index < list.getLength())
 			return list.item(index);
 		return null;
@@ -162,7 +162,7 @@ public class DomXmlList implements XSelectable, Iterable<XSelectable> {
 	 * @param xpath
 	 *            An XPath specifier.
 	 */
-	private DomXmlList getNodes(String xpath) throws X2DataException {
+	public DomXmlList getNodes(String xpath) throws X2DataException {
 		Node node = getCurrentNode();
 		if (node == null)
 			return null;
