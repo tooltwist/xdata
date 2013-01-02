@@ -1,5 +1,11 @@
 package com.tooltwist.xdata;
 
+import java.io.InputStream;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import com.tooltwist.xdata.X2DataType.PluginStyle;
 
 public class X2Data {
@@ -106,6 +112,42 @@ public class X2Data {
 	}
 	
 	/**
+	 * Try to find a document type that understands this object type.
+	 * 
+	 * @param object
+	 * @throws X2DataException
+	 */
+	public X2Data(Object object) throws X2DataException {
+		checkDefaultsLoaded();
+		init();
+		
+		// Find a data type that knows what to do with this object
+		int typeIndex = -1;
+		for (int i = 0; i < numTypes; i++) {
+			if (
+				types[i].getDataFormat() == PluginStyle.SELECTABLE_OBJECT
+				&&
+				types[i].objectIsRecognised(object)
+			) {
+				typeIndex = i;
+				if (types[i].isPreferred())
+					break;
+			}
+		}
+
+		if (typeIndex < 0)
+			throw new X2DataException("Could not determine data type");
+		
+		XSelectable selectable = types[typeIndex].objectToSelectable(this, object);
+		dataForType[typeIndex] = selectable;
+	}
+
+	public X2Data(InputStream is) throws X2DataException {
+		// TODO Auto-generated constructor stub
+		//ZZZZZZZZZZZZZZ
+	}
+
+	/**
 	 * Initialize this specific X2Data object.
 	 * (not to be confused with initializing the types above) 
 	 */
@@ -131,7 +173,7 @@ public class X2Data {
 		// we'll need to convert to string format
 		int typeToConvertToString = -1;
 		for (int i = 0; i < numTypes; i++) {
-			if (dataForType[i] != null)
+			if (dataForType[i] == null)
 				continue;
 			if (types[i].getDataFormat() == PluginStyle.STRING_REPRESENTATION)
 				break; // shouldn't happen because of the check above
@@ -145,15 +187,16 @@ public class X2Data {
 		// Convert the object to a string
 		if (typeToConvertToString >= 0) {
 			// Find the string version of this type
-			int nonStringType = typeToConvertToString;			
 			String type = types[typeToConvertToString].getPrimaryType();
 			int stringType = typeIndex(type + "-string");
 			
 			// Convert from the object to the string, and remember the string version.
 			Object object = dataForType[typeToConvertToString];
-			dataForType[stringType] = types[nonStringType].objectToString(object);
+			String string = types[typeToConvertToString].selectableToString(object);
+			dataForType[stringType] = string;
+			return string;
 		}
-		return null;
+		throw new X2DataException("Could not convert " + types[typeToConvertToString].getType() + " to a String");
 	}
 	
 	public void setString(String string) throws X2DataException {
@@ -219,7 +262,7 @@ public class X2Data {
 				
 				if (indexForSelectableData >= 0) {
 					String dataInStringRepresentation = (String) dataForType[indexForStringData];
-					Object convertedObject = types[indexForSelectableData].stringToObject(dataInStringRepresentation);
+					Object convertedObject = types[indexForSelectableData].stringToSelectable(this, dataInStringRepresentation);
 					dataForType[indexForSelectableData] = convertedObject;
 					return (XSelectable) convertedObject;
 				}
@@ -254,8 +297,8 @@ public class X2Data {
 		if (dataForType[stringTypeIndex] != null) {
 			
 			// We have a string version of the data, so do a conversion to required selectable form.
-			String string = (String) dataForType[stringTypeIndex];
-			XSelectable object = objectType.stringToObject(string);
+			String dataInStringRepresentation = (String) dataForType[stringTypeIndex];
+			XSelectable object = objectType.stringToSelectable(this, dataInStringRepresentation);
 			dataForType[objectTypeIndex] = object;
 			return object;			
 		}
@@ -273,16 +316,15 @@ public class X2Data {
 	 * This is called if the contents of a specific data type has been changed by direct
 	 * communication with it's selector.
 	 * 
+	 * Note: this method is normally only ever called by a selector.
+	 * 
 	 * @param type
 	 * @throws X2DataIncompatibleFormatException 
 	 */
-	//ZZZZ Need to test
-	public void invalidateAllSelectorsExcept(String type) throws X2DataIncompatibleFormatException {
-		int objectTypeIndex = typeIndex(type);
-		if (objectTypeIndex < 0)
-			throw new X2DataIncompatibleFormatException("Unknown format '" + type + "'.");
+	public void invalidateAllSelectorsExcept(Object object) throws X2DataIncompatibleFormatException {
 		for (int i = 0; i < numTypes; i++) {
-			if (i != objectTypeIndex)
+			Object stringOrObject = dataForType[i];
+			if (stringOrObject != object)
 				dataForType[i] = null;
 		}
 	}

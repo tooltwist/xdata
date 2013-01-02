@@ -848,6 +848,11 @@ public class FastXml implements XSelectable, Iterable<XSelectable> {
 		}
 	}
 
+//	@Override
+//	public String getString(String xpath, int occurance) throws FastXmlException {
+//		return getText(ROOT_NODE, xpath, occurance);
+//	}
+
 
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterate over this object using first, next.
@@ -903,6 +908,13 @@ public class FastXml implements XSelectable, Iterable<XSelectable> {
 	@Override
 	public int currentIndex() {
 		return 0;
+	}
+
+	@Override
+	public boolean setCurrentIndex(int index) throws X2DataException {
+		if (index == 0)
+			return true;
+		return false;
 	}
 
 	@Override

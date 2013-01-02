@@ -5,6 +5,8 @@ import java.util.Iterator;
 import com.tooltwist.fastJson.FastJson;
 import com.tooltwist.fastJson.FastJsonException;
 import com.tooltwist.fastJson.FastJsonNodes;
+import com.tooltwist.fastXml.FastXmlNodes;
+import com.tooltwist.xdata.X2Data;
 import com.tooltwist.xdata.X2DataException;
 import com.tooltwist.xdata.X2DataIterator;
 import com.tooltwist.xdata.XIteratorCallback;
@@ -214,6 +216,30 @@ public class FastJsonNodes implements XSelectable, Iterable<XSelectable>
 		if (selectPos < 0 || (selectList == addList && selectPos >= addPos))
 			return -1;
 		return selectPos;
+	}
+
+	@Override
+	public boolean setCurrentIndex(int index) throws X2DataException {
+		
+		// Shuffle through the blocks and set the select pointer to the correct block and position.
+		if (index < 0)
+			return false; // before start
+		FastJsonNodes block = this;
+		for ( ; ; ) {
+			if (index < LIST_SIZE) {
+				if (index >= addPos)
+					return false; // beyond end
+				selectList = block;
+				selectPos = index;
+				return true;
+			} else {
+				// Look at the next block;
+				block = block.next;
+				index -= LIST_SIZE;
+				if (block == null)
+					return false;
+			}
+		}
 	}
 
 	@Override

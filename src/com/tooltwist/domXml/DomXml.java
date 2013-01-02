@@ -14,6 +14,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+//import javax.xml.parsers.DocumentBuilder;
+//import javax.xml.parsers.DocumentBuilderFactory;
+//import javax.xml.parsers.ParserConfigurationException;
+//import javax.xml.transform.TransformerException;
+
 import org.apache.xml.utils.PrefixResolver;
 import org.apache.xml.utils.PrefixResolverDefault;
 import org.apache.xpath.XPath;
@@ -22,9 +27,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.tooltwist.xdata.X2Data;
 import com.tooltwist.xdata.X2DataException;
 import com.tooltwist.xdata.X2DataNotFoundException;
 import com.tooltwist.xdata.XIteratorCallback;
@@ -34,18 +44,25 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 
 	private Document document;
 	private PrefixResolverDefault prefixResolver;
-	private XPathContext rootXpathContext;
-	private int rootContextNode;
+	private XPathContext rootXpathContext = null;
+	private int rootContextNode = -1;
+	private X2Data parentXD;
 
-	public DomXml(String xml) throws DomXmlException {
+	public DomXml(X2Data parent, String xml) throws DomXmlException {
+		this.parentXD = parent;
+		
 		init(xml.toCharArray());
 	}
 
-	public DomXml(char xml[]) throws DomXmlException {
+	public DomXml(X2Data parent, char xml[]) throws DomXmlException {
+		this.parentXD = parent;
+		
 		init(xml);
 	}
 
-	public DomXml(File file, boolean useUnicode) throws DomXmlException {
+	public DomXml(X2Data parent, File file, boolean useUnicode) throws DomXmlException {
+		this.parentXD = parent;
+
 		String path = file.getAbsolutePath();
 		long fileSize = file.length();
 		char arr[] = new char[(int) fileSize];
@@ -121,6 +138,28 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 			// Remove the xpath processing structures, so they'll be recreated for the new document
 			prefixResolver = null;
 			rootContextNode = -1;
+			
+//	        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
+//	        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
+//	        if (impl == null) {
+//	            System.out.println("No DOMImplementation found !");
+//	            System.exit(0);
+//	        }
+//
+//	        System.out.printf("DOMImplementationLS: %s\n", impl.getClass().getName());
+//
+//	        LSParser parser = impl.createLSParser(
+//	                DOMImplementationLS.MODE_SYNCHRONOUS,
+//	                "http://www.w3.org/TR/REC-xml");
+//	        // http://www.w3.org/2001/XMLSchema
+//	        System.out.printf("LSParser: %s\n", parser.getClass().getName());
+//
+//	        
+//	        impl.createLSInput()DomXml.;
+//	        LSInput input = LSInput;
+//			Document doc = parser.parse(input );
+
+			
 		} catch (IOException e) {
 			throw new DomXmlException("Error parsing XML in XData: " + e);
 		} catch (ParserConfigurationException e) {
@@ -154,8 +193,8 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 */
 	public PrefixResolver getPrefixResolver() {
 
-		//
-		// prefixResolver = null;
+		//zzzzz
+		 prefixResolver = null;
 
 		// Check the document is up to date (which may remove prefixResolver and parentContextNode)
 		if (this.prefixResolver == null) {
@@ -177,6 +216,8 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * @see getXpathNodeList
 	 */
 	public int getRootContextNode() {
+//zzzzzzz
+rootContextNode = -1;
 
 		if (rootContextNode >= 0)
 			return rootContextNode;
@@ -199,6 +240,9 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 * @see getXpathNodeList
 	 */
 	public XPathContext getRootXPathContext() {
+		
+		//zzzzzz
+		//rootXpathContext = null;
 
 		if (rootXpathContext != null)
 			return rootXpathContext;
@@ -247,7 +291,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            Which node to return.
 	 * @see getXpathNode
 	 */
-	private NodeList getNodeList(String xpath) throws X2DataException {
+	public NodeList getNodeList(String xpath) throws X2DataException {
 //		if (traceName != null)
 //			logger.debug("XData[" + traceName + "].getNode(String xpath)");
 		try {
@@ -276,7 +320,7 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	private NodeList getNodeList(String xpath, Node target) throws X2DataException {
+	public NodeList getNodeList(String xpath, Node target) throws X2DataException {
 		try {
 			// XPathContext xpathSupport = new XPathContext();
 			XPathContext xpathSupport = getRootXPathContext(); // ZZZZZZZZZ This might be better
@@ -358,6 +402,16 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 		return text;
 	}
 
+//	@Override
+//	public String getString(String xpath, int index) throws X2DataException {
+//		NodeList nl = getNodeList(xpath);
+//		if (index < 0 || index >= nl.getLength())
+//			throw new X2DataException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+//		Node node = nl.item(index);
+//		String string = getString(node);
+//		return string;
+//	}
+
 
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterating over this current object, even though it's not a list.
@@ -406,6 +460,13 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 	public String currentName() {
 		Element element = document.getDocumentElement();
 		return element.getNodeName();
+	}
+
+	@Override
+	public boolean setCurrentIndex(int index) throws X2DataException {
+		if (index == 0)
+			return true;
+		return false;
 	}
 
 	/**
@@ -466,6 +527,459 @@ public class DomXml implements XSelectable, Iterable<XSelectable> {
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
+	}
+
+	
+	//--------------------------------------------------------------------------------------------------------------------
+	// Methods specific to manipulating the DOM.
+	// i.e. non-XSelectable methods
+
+	public DomXml(X2Data parent, Document document) {
+		this.parentXD = parent;
+
+		this.document = document;
+	}
+
+	public DomXml(X2Data parent, Node node) throws DomXmlException {
+		this.parentXD = parent;
+
+		try {
+			 // Create the new document
+			 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			 DocumentBuilder db = dbf.newDocumentBuilder();
+			 Document newDocument = db.newDocument();
+			 Node newNode = newDocument.importNode(node, true);
+			 // Node newNode = node;
+			 newDocument.appendChild(newNode);
+			
+			 // Save it
+			 document = newDocument;
+		 }
+		 catch (ParserConfigurationException e)
+		 {
+			 throw new DomXmlException("Error contructing XData: " + e);
+		 }
+	}
+	
+
+
+	public String getXml() {
+		try {
+//			ByteArrayOutputStream os = new ByteArrayOutputStream();
+//			XMLSerializer ser = new XMLSerializer(os, null);
+//			ser.serialize(document);
+			
+	        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
+	        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
+	        if (impl == null)
+	            throw new X2DataException("No DOMImplementation found.");
+
+	        //System.out.printf("DOMImplementationLS: %s\n", impl.getClass().getName());
+
+			
+			LSSerializer serializer = impl.createLSSerializer();
+//	        LSOutput output = impl.createLSOutput();
+//	        output.setEncoding("UTF-8");
+//	        output.setByteStream(System.out);
+//	        serializer.write(document, output);
+//	        System.out.println();
+	        
+	        String string = serializer.writeToString(document);
+			return string;
+		} catch (Exception e) {
+			return "<error>Could not Serialize DOM Document</error>";
+		}
+	}
+	
+	/**
+	 * Recursively get the text within a specified DOM node. This method does not return XML - it returns all the text
+	 * within the node and it's children.
+	 * 
+	 * @param elem
+	 *            The specified element or node within a DOM document.
+	 * @return The text within the node.
+	 */
+	public static String getString(Node elem) {
+		if (elem.getNodeType() == org.w3c.dom.Node.TEXT_NODE || elem.getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE)
+			return elem.getNodeValue();
+	
+		String s = "";
+		if (elem.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+			NodeList children = elem.getChildNodes();
+			for (int k = 0; k < children.getLength(); k++) {
+				Node child = children.item(k);
+				s += DomXml.getString(child);
+			}
+		}
+		return s;
+	}
+
+	public void notifyDocumentChanged() throws X2DataException {
+		parentXD.invalidateAllSelectorsExcept(this);
+	}
+
+	public void insert(Node root, String xpath, X2Data xd) throws X2DataException {
+		// Check that the tag exists
+		Node parent = checkElementExists(root, xpath);
+		if (parent == null || !(parent instanceof Element))
+			throw new X2DataException("xpath does not resolve to an Element: " + xpath);
+
+		createChild((Element) parent, xd);
+		notifyDocumentChanged();
+	}
+
+	/**
+	 * Find the node that matches a specified XPATH, starting at <code>root</code>.
+	 * If no suitable node can be found, create a new element.
+	 */
+	private Node checkElementExists(Node root, String xpath) throws X2DataException {
+//		if (traceName != null)
+//			logger.debug("XData[" + traceName + "].checkElementExists(Node root, xpath=" + xpath + ")");
+
+		try {
+			// Select the list of nodes
+			XPathContext xpathSupport = new XPathContext();
+			// XPathContext xpathSupport = hidden.getRootXPathContext(); ZZZZZZZZZ This might be better
+
+			Node node = (root.getNodeType() == Node.DOCUMENT_NODE) ? ((Document) root).getDocumentElement() : root;
+			PrefixResolverDefault prefixResolver = new PrefixResolverDefault(node);
+
+			XPath _xpath = new XPath(xpath, null, prefixResolver, XPath.SELECT, null);
+			int contextNode = xpathSupport.getDTMHandleFromNode(root);
+			NodeList nl = _xpath.execute(xpathSupport, contextNode, prefixResolver).nodelist();
+			if (nl.getLength() > 0) {
+				// The xpath exists - return the first node
+				return nl.item(0);
+			}
+
+			// The node does not exist - check the parent exists, then add a new child
+			if (xpath.endsWith("//"))
+				throw new X2DataException("Cannot create xpath - " + xpath);
+			int pos = xpath.lastIndexOf('/');
+			String parentXpath = (pos >= 0) ? xpath.substring(0, pos) : null;
+			String childName = (pos >= 0) ? xpath.substring(pos + 1) : xpath;
+			childName = childName.trim();
+
+			// If the child name has special xpath characters then we can't create it
+			if (childName.length() == 0)
+				throw new X2DataException("Cannot create xPath - " + xpath + " - no child directory specified");
+			if (childName.indexOf("[") >= 0 || childName.indexOf("]") >= 0)
+				throw new X2DataException("Cannot create xPath - " + xpath + " - wildcard characters in name");
+
+			// Get the parent, then add the new child
+			Node parent = (parentXpath == null) ? root : checkElementExists(root, parentXpath);
+			Node child;
+			try {
+				child = parent.getOwnerDocument().createElement(childName);
+			} catch (org.w3c.dom.DOMException e) {
+				if (childName.indexOf(" ") >= 0 || childName.indexOf("\t") >= 0 || childName.indexOf("\n") >= 0 || childName.indexOf("\r") >= 0)
+					throw new X2DataException("Cannot creat node with spaces in the name (" + childName + ")");
+				throw new X2DataException("Cannot create new node named '" + childName + "'");
+			}
+			parent.appendChild(child);
+
+			notifyDocumentChanged();
+			return child;
+		} catch (TransformerException e) {
+			throw new X2DataException("Error selecting text from document: " + e);
+		}
+	}
+
+	/**
+	 * Insert the contents of an XData document under an existing node. The <code>parent<code> element must
+	 * not be in the document within the <code>data</code> parameter.
+	 * @throws X2DataException 
+	 */
+	public static void createChild(Element parent, X2Data data) throws X2DataException {
+		XSelectable selector = data.getSelector("xml-dom");
+		DomXml domXml = (DomXml) selector;
+		Node node = domXml.document.getDocumentElement();
+		Document doc = parent.getOwnerDocument();
+		Node newNode = doc.importNode(node, true);
+		parent.appendChild(newNode);
+	}
+
+	public void insert(Node root, String xpath, Node childNode) throws X2DataException {
+		// Check that the tag exists
+		Node parent = checkElementExists(root, xpath);
+		if (parent == null || !(parent instanceof Element))
+			throw new X2DataException("XData.createChild: xpath does not resolve to an Element");
+
+		createChild((Element) parent, childNode);
+		notifyDocumentChanged();
+	}
+
+	/**
+	 * Insert a node under an existing node.
+	 * 
+	 * 
+	 * @param parent
+	 *            The DOM node under which the new node should be created.
+	 * @param name
+	 *            The tag for the new node.
+	 * @param value
+	 *            The value of the new node.
+	 */
+	public static void createChild(Element parent, Node childNode) {
+		// Take a copy of the new node
+		Document doc = parent.getOwnerDocument();
+		Node newNode = doc.importNode(childNode, true);
+		parent.appendChild(newNode);
+	}
+
+	/**
+	 * Insert a new text node under an existing node.
+	 * 
+	 * <B>Example</B><br>
+	 * The following code demonstrates the use of <code>createChild</code>. <blockquote> String xml =<BR>
+	 * &quot;&lt;product&gt;&quot; +<BR>
+	 * &quot;&nbsp;&nbsp;&nbsp; &lt;code&gt;HAM01&lt;/code&gt;&quot; +<BR>
+	 * &quot;&nbsp;&nbsp;&nbsp; &lt;description&gt;A large hammer&lt;/description&gt;&quot; +<BR>
+	 * &quot;&lt;/product&gt;&quot;;<BR>
+	 * XData data = new XData(xml);<BR>
+	 * Node productNode = data.getXpathNode(&quot;/product&quot;, 0);<BR>
+	 * XData.<B>createChild</B>(productNode, &quot;cost&quot;, &quot;$12.50&quot;);<BR>
+	 * logger.debug(data.getXml());<BR>
+	 * </blockquote> <I>Output:</I><br>
+	 * <blockquote> &lt;product&gt;<BR>
+	 * &nbsp;&nbsp;&nbsp; &lt;code&gt;HAM01&lt;/code&gt;<BR>
+	 * &nbsp;&nbsp;&nbsp; &lt;description&gt;A large hammer&lt;/description&gt;<BR>
+	 * &nbsp;&nbsp;&nbsp; &lt;cost&gt;$12.50&lt;/cost&gt;<BR>
+	 * &lt;/product&gt; </blockquote>
+	 * 
+	 * @param parent
+	 *            The DOM node under which the new node should be created.
+	 * @param name
+	 *            The tag for the new node.
+	 * @param value
+	 *            The value of the new node.
+	 */
+	public static void createChild(Element parent, String tag, String value) {
+		Document doc = parent.getOwnerDocument();
+		Element newElem = doc.createElement(tag);
+		parent.appendChild(newElem);
+
+		Text text = doc.createTextNode(value);
+		newElem.appendChild(text);
+
+		parent.appendChild(doc.createTextNode("\n"));
+	}
+
+	/**
+	 * Get the value of tag directly below a specified DOM element within a DOM document.
+	 * 
+	 * @param elem
+	 *            The parent DOM element or node.
+	 * @param name
+	 *            The tag of the required node.
+	 * @return A string containing XML data.
+	 */
+	public static String getChildValue(Element elem, String name) {
+		NodeList children = elem.getChildNodes();
+		for (int k = 0; k < children.getLength(); k++) {
+			Node child = children.item(k);
+			if (child.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE && child.getNodeName().equals(name)) {
+				// Add together the text in the grandchild.
+				String s = "";
+				NodeList grandChildren = child.getChildNodes();
+				for (int i = 0; i < grandChildren.getLength(); i++) {
+					if (grandChildren.item(i).getNodeType() == org.w3c.dom.Node.TEXT_NODE)
+						s += grandChildren.item(i).getNodeValue();
+					else if (grandChildren.item(i).getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE)
+						s += grandChildren.item(i).getNodeValue();
+				}
+				return s;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Recursively get the text within a specified DOM node. This method does not return XML - it returns all the text
+	 * within the node and it's children.
+	 * 
+	 * @param elem
+	 *            The specified element or node within a DOM document.
+	 * @return The text within the node.
+	 */
+	public static String getText(Node elem) {
+		if (elem.getNodeType() == org.w3c.dom.Node.TEXT_NODE || elem.getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE)
+			return elem.getNodeValue();
+
+		String s = "";
+		if (elem.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+			NodeList children = elem.getChildNodes();
+			for (int k = 0; k < children.getLength(); k++) {
+				Node child = children.item(k);
+				s += DomXml.getText(child);
+			}
+		}
+		return s;
+	}
+
+	/**
+	 * Select nodes from one XData using an XPath, and insert them into this XData directly beneath the node with a
+	 * specified XPath/index. The nodes are not removed from the source XData.
+	 * 
+	 * @param destinationXpath
+	 * @param destinationIndex
+	 * @param sourceXml
+	 * @param sourcePath
+	 * @throws X2DataException 
+	 * @throws XDataException
+	 */
+	public void insert(String destinationXpath, int destinationIndex, X2Data sourceXml, String sourcePath) throws X2DataException {
+		// Copy the input to this module into the exitData element (used to return from the linked module)
+		Node destinationNode = this.getNode(destinationXpath, destinationIndex);
+		
+		DomXml selector = (DomXml) sourceXml.getSelector("xml-dom");
+		NodeList nodeList = selector.getNodeList(sourcePath);
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if (node != null) {
+				createChild((Element) destinationNode, node);
+				this.notifyDocumentChanged();
+			}
+		}
+	}
+
+	/**
+	 * Get a node that matches a specified XPATH. This method returns the index'th node that matches the provided XPath.
+	 * If no suitable node can be found, return null.
+	 * 
+	 * @return The index'th nodes that matches the specified XPath.
+	 * @param xpath
+	 *            An XPath string to be matched.
+	 * @param index
+	 *            Which node to return.
+	 * @throws X2DataException 
+	 * @see getXpathNode
+	 */
+	public Node getNode(String xpath, int index) throws X2DataException {
+		NodeList nodeList = getNodeList(xpath);
+		if (index < 0 || index >= nodeList.getLength())
+			throw new X2DataNotFoundException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+		return nodeList.item(index);
+	}
+
+	/**
+	 * Get a node that matches a specified XPATH below a specifed starting point. This method returns the index'th node
+	 * that matches the provided XPath. If no suitable node can be found, return null.
+	 * 
+	 * @return The index'th nodes that matches the specified XPath.
+	 * @param xpath
+	 *            An XPath string to be matched.
+	 * @param index
+	 *            Which node to return.
+	 * @param target
+	 *            The place from which to start the search.
+	 * @throws X2DataException 
+	 * @see getXpathNodeList
+	 */
+	public Node getNode(String xpath, Node target, int index) throws X2DataException {
+		NodeList nl = getNodeList(xpath, target);
+		if (index < 0 || index >= nl.getLength())
+			throw new X2DataException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+		return nl.item(index);
+	}
+
+	/**
+	 * Insert a node into this XData object at a specified position. Extra nodes will be added to create the parent if
+	 * required.
+	 * 
+	 * @param xpath
+	 *            The xpath for the parent node.
+	 * @param childNode
+	 *            The new node to be added.
+	 */
+	public void insert(String xpath, Node childNode) throws X2DataException {
+		// Check that the tag exists
+		Node root = document.getDocumentElement();
+		insert(root, xpath, childNode);
+	}
+
+	/**
+	 * Replace the text value of a node within the XML.
+	 * @throws X2DataException 
+	 */
+	public void replace(String xpath, String value) throws X2DataException {
+		// Check that the tag exists
+		Node root = document.getDocumentElement();
+		replace(root, xpath, value);
+	}
+
+	/**
+	 * Replace the a node within an XML document with a node from another document.
+	 * @throws X2DataException 
+	 */
+	public void replace(String xpath, X2Data sourceData, String srcXpath) throws X2DataException {
+		// Find the node in the source
+		DomXml domXml = (DomXml) sourceData.getSelector("xml-dom");
+		Document srcDoc = domXml.getDocument();
+		Node srcRoot = srcDoc.getDocumentElement();
+		Node srcNode = checkElementExists(srcRoot, srcXpath);
+
+		// Find the node in the destination
+		Document destDoc = this.getDocument();
+		Node destRoot = destDoc.getDocumentElement();
+		Node destNode = checkElementExists(destRoot, xpath);
+
+		// Delete the existing node
+		Node nextSibling = destNode.getNextSibling();
+		Node parentNode = destNode.getParentNode();
+		parentNode.removeChild(destNode);
+
+		// Add the new node into the same position
+		Node newNode = destDoc.importNode(srcNode, true);
+		parentNode.insertBefore(newNode, nextSibling);
+
+		notifyDocumentChanged();
+	}
+
+	/**
+	 * Replace the text value of a node within the XML.
+	 * 
+	 * @param root
+	 *            Root of the tree.
+	 * @param xpath
+	 *            Position of the node to be replaced.
+	 * @param value
+	 *            If null, the node is removed, not replaced.
+	 * @throws X2DataException
+	 */
+	public void replace(Node root, String xpath, String value) throws X2DataException {
+		// Check that the tag exists
+		Node parent = checkElementExists(root, xpath);
+
+		// Delete any existing child nodes
+		for ( ; ; ) {
+			Node child = parent.getFirstChild();
+			if (child == null)
+				break;
+			parent.removeChild(child);
+		}
+
+		// Add the new child node
+		if (value != null) {
+			Node newNode = parent.getOwnerDocument().createTextNode(value);
+			parent.appendChild(newNode);
+		}
+		notifyDocumentChanged();
+	}
+
+	/**
+	 * Insert all the nodes within another X2Data object into this X2Data object. Extra nodes will be added to create the
+	 * parent if required.
+	 * 
+	 * @param xpath
+	 *            The xpath for the node under which the document will be added.
+	 * @param data
+	 *            The document to be inserted.
+	 */
+	public void insert(String xpath, X2Data xd) throws X2DataException {
+		// Check that the tag exists
+		Node root = document.getDocumentElement();
+		insert(root, xpath, xd);
 	}
 
 }

@@ -29,9 +29,14 @@ public class X2FastJson extends X2DataType {
 	public boolean objectIsRecognised(Object data) {
 		return false;
 	}
+
+	@Override
+	public XSelectable objectToSelectable(X2Data parentXd, Object object) throws X2DataException {
+		return null;
+	}
 	
 	@Override
-	public XSelectable stringToObject(String string) throws X2DataException {
+	public XSelectable stringToSelectable(X2Data parentXd, String string) throws X2DataException {
 		FastJson fastJson;
 		try {
 			fastJson = new FastJson(string);
@@ -44,7 +49,7 @@ public class X2FastJson extends X2DataType {
 	}
 
 	@Override
-	public String objectToString(Object object) throws X2DataException {
+	public String selectableToString(Object object) throws X2DataException {
 		if (object instanceof FastJson) {
 			FastJson fastXml = (FastJson) object;
 			String string = fastXml.toString();

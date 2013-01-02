@@ -61,6 +61,18 @@ public interface XSelectable {
 	 * @return
 	 */
 	public int currentIndex();
+	
+
+	/**
+	 * Set the position in the current list.
+	 * 
+	 * Returns false if the index is invalid.
+	 * 
+	 * @param index
+	 * @throws X2DataException
+	 */
+	public boolean setCurrentIndex(int index) throws X2DataException;
+
 
 
 	//--------------------------------------------------------------------------------------------------------------------

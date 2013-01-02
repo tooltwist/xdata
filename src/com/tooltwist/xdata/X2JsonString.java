@@ -46,15 +46,20 @@ public class X2JsonString extends X2DataType {
 	public boolean objectIsRecognised(Object data) {
 		return false;
 	}
+
+	@Override
+	public XSelectable objectToSelectable(X2Data parentXd, Object object) throws X2DataException {
+		return null;
+	}
 	
 	@Override
-	public XSelectable stringToObject(String string) {
+	public XSelectable stringToSelectable(X2Data parentXd, String string) {
 		// Never called
 		return null;
 	}
 
 	@Override
-	public String objectToString(Object object) {
+	public String selectableToString(Object object) {
 		// Never called
 		return null;
 	}

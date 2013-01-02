@@ -60,6 +60,19 @@ public abstract class X2DataType {
 	 */
 	public abstract boolean stringIsRecognised(String data);
 
+	/**
+	 * Convert from string representation to it's data type form.
+	 * 
+	 * This will only be called if getDataFormat() == STRING_REPRESENTATION and stringIsRecognised(Object data) is true.
+	 * 
+	 * @param dataInStringRepresentation
+	 * @return
+	 * @throws X2DataException
+	 */
+	public abstract XSelectable stringToSelectable(X2Data parentXd, String dataInStringRepresentation) throws X2DataException;
+
+
+
 	//-------------------------------------------------------------------------------------------------------
 	//
 	// Methods used if getDataFormat() returns SELECTABLE_OBJECT.
@@ -76,14 +89,16 @@ public abstract class X2DataType {
 	public abstract boolean objectIsRecognised(Object data);
 
 	/**
-	 * Convert from string representation to it's object form.
+	 * Convert from an object to it's data type form.
+	 * 
+	 * This will only be called if getDataFormat() == SELECTABLE_OBJECT and objectIsRecognised(Object data) is true.
 	 * 
 	 * @param dataInStringRepresentation
 	 * @return
 	 * @throws X2DataException
 	 */
-	public abstract XSelectable stringToObject(String dataInStringRepresentation) throws X2DataException;
-	
+	public abstract XSelectable objectToSelectable(X2Data parentXd, Object object) throws X2DataException;
+
 	/**
 	 * Convert an object of the type represented by this dataType into it's string representation.
 	 *  
@@ -91,6 +106,6 @@ public abstract class X2DataType {
 	 * @return
 	 * @throws X2DataException
 	 */
-	public abstract String objectToString(Object object) throws X2DataException;
+	public abstract String selectableToString(Object object) throws X2DataException;
 
 }

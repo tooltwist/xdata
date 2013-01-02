@@ -2,6 +2,7 @@ package com.tooltwist.fastXml;
 
 import java.util.Iterator;
 
+import com.tooltwist.xdata.X2Data;
 import com.tooltwist.xdata.X2DataException;
 import com.tooltwist.xdata.X2DataIterator;
 import com.tooltwist.xdata.XIteratorCallback;
@@ -126,6 +127,25 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 		}
 	}
 
+//	@Override
+//	public String getString(String xpath, int occurance) {
+//		// If next() hasn't been called yet, use the fist node.
+//		if (selectPos < 0) {
+//			if (numNodes < 1)
+//				return "";
+//			int nodeNum = selectList.nodeNum[0];
+//			return data.getText(nodeNum, xpath, occurance);
+//		}
+//		
+//		// Check we haven't run off the end
+//		if (selectList == addList && selectPos >= addPos)
+//			return null;
+//
+//		// Select from the current node.
+//		int nodeNum = selectList.nodeNum[selectPos];
+//		return data.getText(nodeNum, xpath, occurance);
+//	}
+
 
 	//--------------------------------------------------------------------------------------------------------------------
 	// Return the number of records that can be iterated over.
@@ -184,9 +204,46 @@ public class FastXmlNodes implements XSelectable, Iterable<XSelectable> {
 
 	@Override
 	public int currentIndex() {
-		if (selectPos < 0 || (selectList == addList && selectPos >= addPos))
-			return -1;
-		return selectPos;
+		int pos = 0;
+		FastXmlNodes block = this;
+		for ( ; ; ) {
+			if (block == selectList) {
+				pos += selectPos;
+				return pos;
+			} else {
+				// Look at the next list
+				pos += LIST_SIZE;
+			}
+		}
+		
+		//rrrrrrrrrrrrr
+//		if (selectPos < 0 || (selectList == addList && selectPos >= addPos))
+//			return -1;
+//		return selectPos;
+	}
+
+	@Override
+	public boolean setCurrentIndex(int index) throws X2DataException {
+		
+		// Shuffle through the blocks and set the select pointer to the correct block and position.
+		if (index < 0)
+			return false; // before start
+		FastXmlNodes block = this;
+		for ( ; ; ) {
+			if (index < LIST_SIZE) {
+				if (index >= addPos)
+					return false; // beyond end
+				selectList = block;
+				selectPos = index;
+				return true;
+			} else {
+				// Look at the next block;
+				block = block.next;
+				index -= LIST_SIZE;
+				if (block == null)
+					return false;
+			}
+		}
 	}
 
 	@Override
