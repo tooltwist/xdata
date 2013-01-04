@@ -11,7 +11,7 @@ import java.util.Vector;
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XIterator;
 import com.tooltwist.xdata.XDCallback;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
 /**
  * This class is used to provide high speed XML access. In particular, it avoids creating large numbers of XML objects, like the DOM parser. This parser does not provide comprehensive XPATH or DOM operations. If attempts to use complex XPATHS are attempted, a FastXmlBeyondCapabilityException will be thrown.
@@ -20,7 +20,7 @@ import com.tooltwist.xdata.XDSelector;
  * @see com.dinaa.XData
  * 
  */
-public class FastXml implements XDSelector, Iterable<XDSelector> {
+public class FastXml implements XSelector, Iterable<XSelector> {
 	public static final int ROOT_NODE = -1;
 
 	private static final int TYPE_HEADER = 1; // <?xml ... ?>
@@ -927,7 +927,7 @@ public class FastXml implements XDSelector, Iterable<XDSelector> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterate over this object using a Java iterator
 	
-	public Iterator<XDSelector> iterator() {
+	public Iterator<XSelector> iterator() {
 		return new XIterator(this);
 	}
 	
@@ -935,7 +935,7 @@ public class FastXml implements XDSelector, Iterable<XDSelector> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select elements within this data object
 
-	public XDSelector select(String xpath) {
+	public XSelector select(String xpath) {
 		return getNodes(xpath);
 	}
 
@@ -949,7 +949,7 @@ public class FastXml implements XDSelector, Iterable<XDSelector> {
 
 	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
 		try {
-			XDSelector list = this.getNodes(xpath);
+			XSelector list = this.getNodes(xpath);
 			for (int index = 0; list.hasNext(); index++) {
 				list.next();
 				callback.next(list, index, userData);
@@ -965,7 +965,7 @@ public class FastXml implements XDSelector, Iterable<XDSelector> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select and iterate using a Java iterator
 	
-	public Iterable<XDSelector> foreach(String xpath) throws XDException {
+	public Iterable<XSelector> foreach(String xpath) throws XDException {
 		FastXmlNodes list = this.getNodes(xpath);
 		return list;
 	}

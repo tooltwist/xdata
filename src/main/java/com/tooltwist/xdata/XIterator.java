@@ -6,10 +6,10 @@ import java.util.Iterator;
 /**
  * This class acts as an adaptor to allow standard Java iteration over XDSelector objects.
  * <p>
- * It is required because the APIs of {@link XDSelector} and {@link Iterator} are incompatible
+ * It is required because the APIs of {@link XSelector} and {@link Iterator} are incompatible
  * due to different signature and semantics of the method {@code next()}.
  * <p>
- * A XDSelector iterates internally with each call to {@link XDSelector#next()}. For each iteration, the
+ * A XDSelector iterates internally with each call to {@link XSelector#next()}. For each iteration, the
  * object to access the data remains the same (i.e. the XDSelector).
  * <p>
  * An iterator returns a different object each time {@link Iterator#next()} is called.
@@ -20,11 +20,11 @@ import java.util.Iterator;
  * @author philipcallender
  *
  */
-public class XIterator implements Iterator<XDSelector> {
+public class XIterator implements Iterator<XSelector> {
 	
-	private XDSelector selectable;
+	private XSelector selectable;
 
-	public XIterator(XDSelector selectable) {
+	public XIterator(XSelector selectable) {
 		this.selectable = selectable;
 	}
 
@@ -39,7 +39,7 @@ public class XIterator implements Iterator<XDSelector> {
 	 * Actually the same XDSelector is returned every time, but its internal
 	 * pointer will be positioned to the next record in the list it maintains.
 	 */
-	public XDSelector next() {
+	public XSelector next() {
 		selectable.next();
 		return selectable;
 	}

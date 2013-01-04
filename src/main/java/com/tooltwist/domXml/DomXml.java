@@ -36,9 +36,9 @@ import com.tooltwist.xdata.XD;
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XDNotFoundException;
 import com.tooltwist.xdata.XDCallback;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
-public class DomXml implements XDSelector, Iterable<XDSelector> {
+public class DomXml implements XSelector, Iterable<XSelector> {
 
 	private Document document;
 //	private PrefixResolverDefault prefixResolver;
@@ -434,7 +434,7 @@ public class DomXml implements XDSelector, Iterable<XDSelector> {
 	}
 
 	@Override
-	public Iterator<XDSelector> iterator() {
+	public Iterator<XSelector> iterator() {
 		return null;
 	}
 
@@ -509,14 +509,14 @@ public class DomXml implements XDSelector, Iterable<XDSelector> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Selections relative to this object, using an xpath.
 	
-	public XDSelector select(String xpath) throws XDException {
+	public XSelector select(String xpath) throws XDException {
 		NodeList nl = getNodeList(xpath);
 		return new DomXmlList(nl, this);
 	}
 
 	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
 		try {
-			XDSelector list = this.getNodes(xpath);
+			XSelector list = this.getNodes(xpath);
 			for (int index = 0; list.next(); index++) {
 				callback.next(list, index, userData);
 			}		
@@ -531,7 +531,7 @@ public class DomXml implements XDSelector, Iterable<XDSelector> {
 		foreach(xpath, null, callback);
 	}
 
-	public Iterable<XDSelector> foreach(String xpath) throws XDException {
+	public Iterable<XSelector> foreach(String xpath) throws XDException {
 		try {
 			return getNodes(xpath);
 		} catch (Exception e) {
@@ -673,7 +673,7 @@ public class DomXml implements XDSelector, Iterable<XDSelector> {
 	 * @throws XDException 
 	 */
 	public static void createChild(Element parent, XD data) throws XDException {
-		XDSelector selector = data.getSelector("xml-dom");
+		XSelector selector = data.getSelector("xml-dom");
 		DomXml domXml = (DomXml) selector;
 		Node node = domXml.document.getDocumentElement();
 		Document doc = parent.getOwnerDocument();

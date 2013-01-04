@@ -2,7 +2,7 @@ package com.tooltwist.xdata;
 
 import com.tooltwist.fastJson.FastJson;
 
-public class X2FastJson extends XDSelectorType {
+public class X2FastJson extends XSelectorPlugin {
 
 	@Override
 	public PluginStyle getDataFormat() {
@@ -31,12 +31,12 @@ public class X2FastJson extends XDSelectorType {
 	}
 
 	@Override
-	public XDSelector objectToSelectable(XD parentXd, Object object) throws XDException {
+	public XSelector objectToSelectable(XD parentXd, Object object) throws XDException {
 		return null;
 	}
 	
 	@Override
-	public XDSelector stringToSelectable(XD parentXd, String string) throws XDException {
+	public XSelector stringToSelectable(XD parentXd, String string) throws XDException {
 		FastJson fastJson;
 		try {
 			fastJson = new FastJson(string);

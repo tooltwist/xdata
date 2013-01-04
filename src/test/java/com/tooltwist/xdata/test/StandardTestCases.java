@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.tooltwist.xdata.XD;
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XDCallback;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
 public abstract class StandardTestCases {
 	
@@ -26,7 +26,7 @@ public abstract class StandardTestCases {
 		XD data = new XD(INPUT_DATA());
 		
 		// Check the returned selector
-		XDSelector selector = data.getSelector(DATA_TYPE());
+		XSelector selector = data.getSelector(DATA_TYPE());
 		if (selector == null) {
 			fail("No object returned");
 		} else if ( !EXPECTED_SELECTOR_CLASS().isInstance(selector)) {
@@ -48,7 +48,7 @@ public abstract class StandardTestCases {
 
 		// Create object with list of country/state/city
 		XD data = new XD(INPUT_DATA());
-		XDSelector selector = data.getSelector(DATA_TYPE());
+		XSelector selector = data.getSelector(DATA_TYPE());
 
 		// Check the return type
 		if ( !EXPECTED_SELECTOR_CLASS().isInstance(selector))
@@ -100,8 +100,8 @@ public abstract class StandardTestCases {
 	public void relative_data_access() throws XDException {
 
 		// Create object with list of country/state/city
-		XDSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
-		XDSelector data = selector.select("/data");
+		XSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector data = selector.select("/data");
 
 		// Check the return type
 		if ( !EXPECTED_ITERATOR_CLASS().isInstance(data)) {
@@ -164,7 +164,7 @@ public abstract class StandardTestCases {
 	public final void index_returning_field() throws XDException {
 
 		// Create object with list of country/state/city
-		XDSelector data = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector data = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 		
 		// Accessing single fields
 		Misc.checkXpathValue(data, "/*/country[1]/name", "Australia");
@@ -177,10 +177,10 @@ public abstract class StandardTestCases {
 	public final void index_returning_list() throws XDException {
 
 		// Create object with list of country/state/city
-		XDSelector data = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector data = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 		
 		// Check selecting state/city via country
-		XDSelector cities = data.select("/*/country[1]/state[1]/city");
+		XSelector cities = data.select("/*/country[1]/state[1]/city");
 		assertEquals("Expected countries.size() to be 4", 4, cities.size());
 
 		cities = data.select("/*/country[1]/state[2]/city");
@@ -210,10 +210,10 @@ public abstract class StandardTestCases {
 	public void traditional_iteration() throws XDException {
 		
 		// Create object with list of country/state/city
-		XDSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 		
 		// Select the records
-		XDSelector countries = selector.select("/*/country");
+		XSelector countries = selector.select("/*/country");
 		if (EXPECTED_ITERATOR_CLASS().isInstance(countries)) {
 			// As expected
 		} else {
@@ -246,16 +246,16 @@ public abstract class StandardTestCases {
 	@Test
 	public void traditional_iteration_with_subselect() throws XDException {
 		// Create object with list of country/state/city
-		XDSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 
 		// Iterate through a list of states
-		XDSelector states = selector.select("/*/country/state");
+		XSelector states = selector.select("/*/country/state");
 		int countState = 0;
 		for ( ; states.next(); countState++) {
 //			String stateName = states.getString("name");
 			
 			// Get the cities in this state.
-			XDSelector cities = states.select("./city");
+			XSelector cities = states.select("./city");
 			if (EXPECTED_ITERATOR_CLASS().isInstance(cities)) {
 				// As expected
 			} else {
@@ -300,7 +300,7 @@ public abstract class StandardTestCases {
 	public void callback_iteration() throws XDException {
 		
 		// Create object with list of country/state/city
-		XDSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 		
 		// Prepare a user defined object (we'll use it for counting).
 		class Counter {
@@ -312,7 +312,7 @@ public abstract class StandardTestCases {
 		selector.foreach("/*/country", counter, new XDCallback() {
 
 			@Override
-			public void next(XDSelector item, int index, Object myData) throws XDException {
+			public void next(XSelector item, int index, Object myData) throws XDException {
 				Counter counter = (Counter) myData;
 				Misc.checkCountry(item, index);
 
@@ -332,7 +332,7 @@ public abstract class StandardTestCases {
 	public void callback_iteration_with_subselect() throws XDException {
 		
 		// Create object with list of country/state/city
-		XDSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 		
 		// Prepare a user defined object (we'll use it for counting).
 		class Counter {
@@ -345,7 +345,7 @@ public abstract class StandardTestCases {
 		selector.foreach("/*/country/state", counter, new XDCallback() {
 
 			@Override
-			public void next(XDSelector state, int index, Object myData) throws XDException {
+			public void next(XSelector state, int index, Object myData) throws XDException {
 				Counter counter = (Counter) myData;
 //				String stateName = state.getString("name");
 
@@ -353,7 +353,7 @@ public abstract class StandardTestCases {
 				state.foreach("./city", counter, new XDCallback() {
 
 					@Override
-					public void next(XDSelector city, int index, Object myData) throws XDException {
+					public void next(XSelector city, int index, Object myData) throws XDException {
 						Counter counter = (Counter) myData;
 //						String cityName = city.getString(".");
 						Misc.checkCity(city, counter.countStates, counter.countCities);
@@ -394,11 +394,11 @@ public abstract class StandardTestCases {
 	public void java_iteration() throws XDException {
 		
 		// Create object with list of country/state/city
-		XDSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 
 		// Check the countries
 		int count = 0;
-		for (XDSelector countries : selector.foreach("/*/country")) {
+		for (XSelector countries : selector.foreach("/*/country")) {
 			Misc.checkCountry(countries, count);
 
 			// Check the currentIndex method works.
@@ -416,16 +416,16 @@ public abstract class StandardTestCases {
 	public void java_iteration_with_subselect() throws XDException {
 		
 		// Create object with list of country/state/city
-		XDSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 
 		// Iterate through the states
 		int countState = 0;
-		for (XDSelector state : selector.foreach("/*/country/state")) {
+		for (XSelector state : selector.foreach("/*/country/state")) {
 //			String stateName = state.getString("name");
 
 			// Get the cities in this state.
 			int countCity = 0;
-			for (XDSelector city : state.foreach("city")) {
+			for (XSelector city : state.foreach("city")) {
 //				String cityName = city.getString(".");
 				Misc.checkCity(city, countState, countCity);
 				
@@ -466,8 +466,8 @@ public abstract class StandardTestCases {
 	public void wildcard_data_access() throws XDException {
 
 		// Create object with list of country/state/city
-		XDSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
-		XDSelector fields = selector.select("/data/*");
+		XSelector selector = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
+		XSelector fields = selector.select("/data/*");
 
 		// Check the return type
 		if ( !EXPECTED_ITERATOR_CLASS().isInstance(fields)) {
@@ -495,7 +495,7 @@ public abstract class StandardTestCases {
 		}
 
 		// Test the same, but with a sub-select.
-		XDSelector data = selector.select("/data");
+		XSelector data = selector.select("/data");
 		data.next();
 		fields = data.select("./*");
 		for (int i = 0; i <= 10; i++) {

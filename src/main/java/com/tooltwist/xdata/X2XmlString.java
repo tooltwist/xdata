@@ -1,6 +1,6 @@
 package com.tooltwist.xdata;
 
-public class X2XmlString extends XDSelectorType {
+public class X2XmlString extends XSelectorPlugin {
 
 	@Override
 	public PluginStyle getDataFormat() {
@@ -48,12 +48,12 @@ public class X2XmlString extends XDSelectorType {
 	}
 
 	@Override
-	public XDSelector objectToSelectable(XD parentXd, Object object) throws XDException {
+	public XSelector objectToSelectable(XD parentXd, Object object) throws XDException {
 		return null;
 	}
 	
 	@Override
-	public XDSelector stringToSelectable(XD parentXd, String string) {
+	public XSelector stringToSelectable(XD parentXd, String string) {
 		// Never called
 		return null;
 	}

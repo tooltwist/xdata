@@ -11,7 +11,7 @@ import com.tooltwist.fastJson.FastJson;
 import com.tooltwist.fastXml.FastXml;
 import com.tooltwist.xdata.XD;
 import com.tooltwist.xdata.XDException;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
 
 public class UnitTest_XD_preferredSelectors {
@@ -48,7 +48,7 @@ public class UnitTest_XD_preferredSelectors {
 	public final void check(String string, Class<?> expectedClass) throws XDException {
 
 		XD data = new XD(string);
-		XDSelector selector = data.getSelector();
+		XSelector selector = data.getSelector();
 		if ( !expectedClass.isInstance(selector))
 			fail("Expected selector to be " + expectedClass.getName());
 	}

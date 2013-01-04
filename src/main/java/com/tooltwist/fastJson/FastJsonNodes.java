@@ -8,9 +8,9 @@ import com.tooltwist.fastJson.FastJsonNodes;
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XIterator;
 import com.tooltwist.xdata.XDCallback;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
-public class FastJsonNodes implements XDSelector, Iterable<XDSelector>
+public class FastJsonNodes implements XSelector, Iterable<XSelector>
 {
 	private static final int LIST_SIZE = 1024;
 
@@ -254,7 +254,7 @@ public class FastJsonNodes implements XDSelector, Iterable<XDSelector>
 	// Iterate over this object using a Java iterator
 	
 	@Override
-	public Iterator<XDSelector> iterator() {
+	public Iterator<XSelector> iterator() {
 		return new XIterator(this);
 	}
 
@@ -263,7 +263,7 @@ public class FastJsonNodes implements XDSelector, Iterable<XDSelector>
 	// Select elements within this data object
 
 	@Override
-	public XDSelector select(String xpath) {
+	public XSelector select(String xpath) {
 		return getNodes(xpath);
 	}
 
@@ -279,7 +279,7 @@ public class FastJsonNodes implements XDSelector, Iterable<XDSelector>
 	@Override
 	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
 		try {
-			XDSelector list = this.getNodes(xpath);
+			XSelector list = this.getNodes(xpath);
 			for (int index = 0; list.next(); index++) {
 				callback.next(list, index, userData);
 			}		
@@ -295,7 +295,7 @@ public class FastJsonNodes implements XDSelector, Iterable<XDSelector>
 	// Select and iterate using a Java iterator
 	
 	@Override
-	public Iterable<XDSelector> foreach(String xpath) throws XDException {
+	public Iterable<XSelector> foreach(String xpath) throws XDException {
 		FastJsonNodes list = this.getNodes(xpath);
 		return list;
 	}

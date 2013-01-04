@@ -13,7 +13,7 @@ import java.util.Iterator;
  * @author philipcallender
  *
  */
-public interface XDSelector {
+public interface XSelector {
 
 
 	//--------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ public interface XDSelector {
 	 * Iterate through the selection.
 	 * @return
 	 */
-	public Iterator<XDSelector> iterator();
+	public Iterator<XSelector> iterator();
 	
 	/**
 	 * Return the number of records in this selection.
@@ -110,7 +110,7 @@ public interface XDSelector {
 	 * @throws XDataNotFoundException
 	 * @throws XDataException
 	 */
-	public XDSelector select(String xpath) throws XDException;
+	public XSelector select(String xpath) throws XDException;
 
 	/**
 	 * Iterate through matching items using a callback object to handle each item.
@@ -167,6 +167,6 @@ public interface XDSelector {
 	 * @return
 	 * @throws XDataException
 	 */
-	public Iterable<XDSelector> foreach(String xpath) throws XDException;
+	public Iterable<XSelector> foreach(String xpath) throws XDException;
 
 }

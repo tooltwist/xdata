@@ -1,9 +1,26 @@
 package com.tooltwist.xdata;
 
 import java.io.InputStream;
-import com.tooltwist.xdata.XDSelectorType.PluginStyle;
+import java.util.Iterator;
 
-public class XD {
+import com.tooltwist.xdata.XSelectorPlugin.PluginStyle;
+
+/**
+ * This class provides a data-independent way of accessing data.
+ * 
+ * Data may be loaded into the class in various formats, but then accessed with a single consistent API
+ * as provided by the {@link XSelector} interface.
+ * 
+ * The XSelector interface provides iteration over a list of data items. In the case of this
+ * class there is only a single data hierarchy, which is treated as a list of one record
+ * (the top of the hierarchy). The XSelector methods can then be used to select data or
+ * further lists beneath this hierarchy.
+ *
+ * @see {@link https://github.com/tooltwist/xdata}
+ *   
+ * @author philipcallender
+ */
+public class XD implements XSelector {
 
 	//-----------------------------------------------------------------------------------------------------
 	//	Code related to a the types used in XD objects.
@@ -19,7 +36,7 @@ public class XD {
 	 *  - types may NOT be removed from this list.
 	 *  - types must be added using registerType_internal, either directly or via registerType().
 	 */
-	private static XDSelectorType[] types = new XDSelectorType[6]; // Initial size
+	private static XSelectorPlugin[] types = new XSelectorPlugin[6]; // Initial size
 	
 	/**
 	 * The number of registered data types.
@@ -44,12 +61,12 @@ public class XD {
 		}
 	}
 	
-	public synchronized static void registerType(String type, XDSelectorType plugin) {
+	public synchronized static void registerType(String type, XSelectorPlugin plugin) {
 		checkDefaultsLoaded();
 		registerType_internal(type, plugin);
 	}
 	
-	private synchronized static void registerType_internal(String type, XDSelectorType plugin) {
+	private synchronized static void registerType_internal(String type, XSelectorPlugin plugin) {
 		
 		// Make sue this plugin knows it's type
 		plugin.setType(type);
@@ -57,7 +74,7 @@ public class XD {
 		// Make sure the type list is big enough to add another.
 		if (numTypes + 1 > types.length) {
 			int newSize = types.length + 10;
-			XDSelectorType[] newList = new XDSelectorType[newSize];
+			XSelectorPlugin[] newList = new XSelectorPlugin[newSize];
 			for (int i = 0; i < numTypes; i++) {
 				newList[i] = types[i];
 			}
@@ -87,7 +104,16 @@ public class XD {
 		return -1;
 	}
 	
-	public static String detectTypeName(String string) {
+	/**
+	 * Try to recognize the data type of a String.
+	 * This method will call ({@link XSelectorPlugin#stringIsRecognised(String)} for each
+	 * string handling plugin, until one is found that recognizes the string. 
+	 * 
+	 * @param string
+	 * @return
+	 * A string identifying the type of data in <code>string</code>.
+	 */
+	public static String recogniseType(String string) {
 		int type = detectType(string);
 		if (type >= 0)
 			return types[type].getType();
@@ -103,6 +129,9 @@ public class XD {
 		checkDefaultsLoaded();
 		init();
 		
+		if (data.trim().equals(""))
+			data = "<empty/>";
+
 		setString(data);
 	}
 	
@@ -133,7 +162,7 @@ public class XD {
 		if (typeIndex < 0)
 			throw new XDException("Could not determine data type");
 		
-		XDSelector selectable = types[typeIndex].objectToSelectable(this, object);
+		XSelector selectable = types[typeIndex].objectToSelectable(this, object);
 		dataForType[typeIndex] = selectable;
 	}
 
@@ -210,24 +239,24 @@ public class XD {
 		}
 	}
 
-	public XDSelector getSelector() throws XDException {
+	public XSelector getSelector() throws XDException {
 		
 		// See if we already have data in a selectable format.
 		for (int i = 0; i < numTypes && i < dataForType.length; i++) {
-			XDSelectorType type = types[i];
+			XSelectorPlugin type = types[i];
 			Object object = dataForType[i];
 
 			if (object == null)
 				continue;
 			if (type.getDataFormat() == PluginStyle.SELECTABLE_OBJECT) {
 				// Have data, and it's a selectable
-				return (XDSelector) object;
+				return (XSelector) object;
 			}
 		}
 		
 		// We don't have a selectable object already, so we need to create one from any string data we have.
 		for (int i = 0; i < numTypes && i < dataForType.length; i++) {
-			XDSelectorType type = types[i];
+			XSelectorPlugin type = types[i];
 			Object object = dataForType[i];
 
 			if (object == null)
@@ -240,7 +269,7 @@ public class XD {
 				String prefix = type.getPrimaryType() + "-";
 				int indexForSelectableData = -1;
 				for (int i2 = 0; i2 < dataForType.length; i2++) {
-					XDSelectorType type2 = types[i2];
+					XSelectorPlugin type2 = types[i2];
 					
 					// If this type selectable, and can it convert from the type of string we have?
 					// i.e. does it have the same primary type (json, xml, etc)
@@ -259,7 +288,7 @@ public class XD {
 					String dataInStringRepresentation = (String) dataForType[indexForStringData];
 					Object convertedObject = types[indexForSelectableData].stringToSelectable(this, dataInStringRepresentation);
 					dataForType[indexForSelectableData] = convertedObject;
-					return (XDSelector) convertedObject;
+					return (XSelector) convertedObject;
 				}
 				
 				// We couldn't convert this type of string... try the next.
@@ -271,7 +300,7 @@ public class XD {
 		throw new XDUnknownConversionException("Could not convert to a selectable format");//ZZZZZ check message
 	}
 
-	public XDSelector getSelector(String type) throws XDException {
+	public XSelector getSelector(String type) throws XDException {
 		
 		// Check the requested type is actually selectable
 		int objectTypeIndex = typeIndex(type);
@@ -282,18 +311,18 @@ public class XD {
 		
 		// Do we already have the data in the required format?
 		if (dataForType[objectTypeIndex] != null)
-			return (XDSelector) dataForType[objectTypeIndex];
+			return (XSelector) dataForType[objectTypeIndex];
 		
 		// We'll need to convert from the string version.
 		// Do we have the requested data type in it's string representation?
-		XDSelectorType objectType = types[objectTypeIndex];		
+		XSelectorPlugin objectType = types[objectTypeIndex];		
 		String stringTypeName = types[objectTypeIndex].getPrimaryType() + "-string";
 		int stringTypeIndex = typeIndex(stringTypeName);
 		if (dataForType[stringTypeIndex] != null) {
 			
 			// We have a string version of the data, so do a conversion to required selectable form.
 			String dataInStringRepresentation = (String) dataForType[stringTypeIndex];
-			XDSelector object = objectType.stringToSelectable(this, dataInStringRepresentation);
+			XSelector object = objectType.stringToSelectable(this, dataInStringRepresentation);
 			dataForType[objectTypeIndex] = object;
 			return object;			
 		}
@@ -322,5 +351,107 @@ public class XD {
 			if (stringOrObject != object)
 				dataForType[i] = null;
 		}
+	}
+
+	
+	//-----------------------------------------------------------------------------------------------------
+	//	Convenience methods to implement XDSelector.
+	//	These are provided simply to allow the use of data.getString(xpath) instead of data.getSelector().getString(xpath)
+	//
+
+	/**
+	 * This data type does not provide a list of records, so the {@link #next()} method only returns true once.<p>
+	 * To iterate over elements within this object, use {@link #select(String)} or one of the {@link #foreach(String)} methods.
+	 */
+	@Override
+	public Iterator<XSelector> iterator() {
+		return null;
+	}
+
+	// Only iterate one time - as if there was a list of one record.
+	private boolean beenToFirst = false;
+
+	/**
+	 * Return the number of records in this selection.
+	 * <p>
+	 * Actually, this will always return one. Iteration over
+	 * this type is provided for consistency, but only accesses the top of the data hierarchy.
+	 */
+	@Override
+	public int size() {
+		return 1;
+	}
+
+	/**
+	 * Return the index of the data element currently being iterated over.
+	 * <p>
+	 * Actually, this will always return zero (the first element). Iteration over
+	 * this type is provided for consistency, but only accesses the top of the data hierarchy.
+	 */
+	@Override
+	public void first() {
+		beenToFirst = false;
+	}
+
+	@Override
+	public boolean hasNext() {
+		if (beenToFirst)
+			return false;
+		return true;
+	}
+
+	@Override
+	public boolean next() {
+		if (beenToFirst)
+			return false;
+		beenToFirst = true;
+		return true;
+	}
+
+	@Override
+	public String currentName() {
+		try {
+			return this.getSelector().currentName();
+		} catch (XDException e) {
+			// Should not be possible.
+			// Just in case, we'll throw an exception, even though this method doesn't declare a thrown exception.
+			throw new NullPointerException();
+			//return "unknown";
+		}
+	}
+
+	@Override
+	public int currentIndex() {
+		return 0;
+	}
+
+	@Override
+	public boolean setCurrentIndex(int index) throws XDException {
+		return this.getSelector().setCurrentIndex(index);
+	}
+
+	@Override
+	public String getString(String xpath) throws XDException {
+		return this.getSelector().getString(xpath);
+	}
+
+	@Override
+	public XSelector select(String xpath) throws XDException {
+		return this.getSelector().select(xpath);
+	}
+
+	@Override
+	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
+		this.getSelector().foreach(xpath, userData, callback);
+	}
+
+	@Override
+	public void foreach(String xpath, XDCallback callback) throws XDException {
+		this.getSelector().foreach(xpath, callback);
+	}
+
+	@Override
+	public Iterable<XSelector> foreach(String xpath) throws XDException {
+		return this.getSelector().foreach(xpath);
 	}
 }

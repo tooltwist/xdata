@@ -12,7 +12,7 @@ import com.tooltwist.fastJson.FastJson;
 import com.tooltwist.fastJson.FastJsonNodes;
 import com.tooltwist.xdata.XD;
 import com.tooltwist.xdata.XDException;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
 
 public class XD_fastJson_Test extends StandardTestCases {
@@ -71,17 +71,17 @@ public class XD_fastJson_Test extends StandardTestCases {
 	// Tests
 
 
-	@Test
-	public void showDebug() throws XDException {
-		
-		// Create object with list of country/state/city
-		XD data = new XD(INPUT_DATA());
-		XDSelector selector = data.getSelector(DATA_TYPE());
-
-		// Display debug
-		FastJson fastJson = (FastJson) selector;
-		fastJson.debugDump();
-	}
+//	@Test
+//	public void showDebug() throws XDException {
+//		
+//		// Create object with list of country/state/city
+//		XD data = new XD(INPUT_DATA());
+//		XDSelector selector = data.getSelector(DATA_TYPE());
+//
+//		// Display debug
+//		FastJson fastJson = (FastJson) selector;
+//		fastJson.debugDump();
+//	}
 
 	@Test
 	public void invalidJson() {

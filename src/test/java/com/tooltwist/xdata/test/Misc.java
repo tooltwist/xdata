@@ -4,17 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import com.tooltwist.xdata.XDException;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
 public class Misc {
 
-	public static void checkXpathValue(XDSelector selector, String xpath, String expectedValue) throws XDException {
+	public static void checkXpathValue(XSelector selector, String xpath, String expectedValue) throws XDException {
 		String value = selector.getString(xpath);
 		assertEquals("xpath '" + xpath + "' should return value '" + expectedValue + "'", expectedValue, value);
 	}
 
 
-	public static void checkCountry(XDSelector countries, int cnt) throws XDException {
+	public static void checkCountry(XSelector countries, int cnt) throws XDException {
 		switch (cnt) {
 		case 0:
 			Misc.checkXpathValue(countries, "name", "Australia");
@@ -27,7 +27,7 @@ public class Misc {
 		}
 	}
 
-	public static void checkCity(XDSelector data, int stateNo, int cityNo) throws XDException {
+	public static void checkCity(XSelector data, int stateNo, int cityNo) throws XDException {
 		String city = data.getString(".");
 		checkCity(city, stateNo, cityNo);
 	}

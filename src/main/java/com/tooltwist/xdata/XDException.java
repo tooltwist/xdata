@@ -7,4 +7,8 @@ public class XDException extends Exception {
 		super(string);
 	}
 
+	public XDException(Exception e) {
+		super(e);
+	}
+
 }

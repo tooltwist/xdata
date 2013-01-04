@@ -14,7 +14,7 @@ import com.tooltwist.fastJson.FastJsonNodes;
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XIterator;
 import com.tooltwist.xdata.XDCallback;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
 /**
  * Parse a JSON text object, without creating large numbers of Java objects.
@@ -25,7 +25,7 @@ import com.tooltwist.xdata.XDSelector;
  * @author philipcallender
  *
  */
-public class FastJson implements XDSelector, Iterable<XDSelector> {
+public class FastJson implements XSelector, Iterable<XSelector> {
 	
 	public static final int ROOT_NODE = -1;
 	
@@ -1414,7 +1414,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	// Iterate over this object using a Java iterator
 	
 	@Override
-	public Iterator<XDSelector> iterator() {
+	public Iterator<XSelector> iterator() {
 		return new XIterator(this);
 	}
 
@@ -1424,7 +1424,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	// Select elements within this data object
 
 	@Override
-	public XDSelector select(String xpath) {
+	public XSelector select(String xpath) {
 		return getNodes(xpath);
 	}
 
@@ -1440,7 +1440,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	@Override
 	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
 		try {
-			XDSelector list = this.getNodes(xpath);
+			XSelector list = this.getNodes(xpath);
 			for (int index = 0; list.hasNext(); index++) {
 				list.next();
 				callback.next(list, index, userData);
@@ -1457,7 +1457,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	// Select and iterate using a Java iterator
 	
 	@Override
-	public Iterable<XDSelector> foreach(String xpath) throws XDException {
+	public Iterable<XSelector> foreach(String xpath) throws XDException {
 		FastJsonNodes list = this.getNodes(xpath);
 		return list;
 	}

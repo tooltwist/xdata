@@ -2,7 +2,7 @@ package com.tooltwist.xdata;
 
 import com.tooltwist.fastXml.FastXml;
 
-public class X2FastXml extends XDSelectorType {
+public class X2FastXml extends XSelectorPlugin {
 
 	@Override
 	public PluginStyle getDataFormat() {
@@ -31,7 +31,7 @@ public class X2FastXml extends XDSelectorType {
 	}
 	
 	@Override
-	public XDSelector stringToSelectable(XD parentXd, String string) throws XDException {
+	public XSelector stringToSelectable(XD parentXd, String string) throws XDException {
 		FastXml fastXml;
 		try {
 			fastXml = new FastXml(string);
@@ -44,7 +44,7 @@ public class X2FastXml extends XDSelectorType {
 	}
 
 	@Override
-	public XDSelector objectToSelectable(XD parentXd, Object object) throws XDException {
+	public XSelector objectToSelectable(XD parentXd, Object object) throws XDException {
 		return null;
 	}
 

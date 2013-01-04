@@ -5,7 +5,7 @@ import org.w3c.dom.Node;
 
 import com.tooltwist.domXml.DomXml;
 
-public class X2DomXml extends XDSelectorType {
+public class X2DomXml extends XSelectorPlugin {
 
 	@Override
 	public PluginStyle getDataFormat() {
@@ -24,7 +24,7 @@ public class X2DomXml extends XDSelectorType {
 	}
 	
 	@Override
-	public XDSelector stringToSelectable(XD parent, String string) throws XDException {
+	public XSelector stringToSelectable(XD parent, String string) throws XDException {
 		DomXml fastXml;
 		try {
 			fastXml = new DomXml(parent, string);
@@ -52,7 +52,7 @@ public class X2DomXml extends XDSelectorType {
 	}
 
 	@Override
-	public XDSelector objectToSelectable(XD xd, Object object) throws XDException {
+	public XSelector objectToSelectable(XD xd, Object object) throws XDException {
 		try {
 			if (object instanceof Document) {
 				DomXml fastXml = new DomXml(xd, (Document)object);

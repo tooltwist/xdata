@@ -6,7 +6,7 @@ package com.tooltwist.xdata;
  * @author philipcallender
  *
  */
-public abstract class XDSelectorType {
+public abstract class XSelectorPlugin {
 	
 	public enum PluginStyle { STRING_REPRESENTATION, SELECTABLE_OBJECT };
 
@@ -69,7 +69,7 @@ public abstract class XDSelectorType {
 	 * @return
 	 * @throws XDException
 	 */
-	public abstract XDSelector stringToSelectable(XD parentXd, String dataInStringRepresentation) throws XDException;
+	public abstract XSelector stringToSelectable(XD parentXd, String dataInStringRepresentation) throws XDException;
 
 
 
@@ -97,7 +97,7 @@ public abstract class XDSelectorType {
 	 * @return
 	 * @throws XDException
 	 */
-	public abstract XDSelector objectToSelectable(XD parentXd, Object object) throws XDException;
+	public abstract XSelector objectToSelectable(XD parentXd, Object object) throws XDException;
 
 	/**
 	 * Convert an object of the type represented by this dataType into it's string representation.

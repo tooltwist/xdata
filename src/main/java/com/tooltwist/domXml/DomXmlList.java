@@ -8,9 +8,9 @@ import org.w3c.dom.NodeList;
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XIterator;
 import com.tooltwist.xdata.XDCallback;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
-public class DomXmlList implements XDSelector, Iterable<XDSelector> {
+public class DomXmlList implements XSelector, Iterable<XSelector> {
 
 	private NodeList list;
 	private DomXml xmlData;	// only used to get the XPath values
@@ -95,7 +95,7 @@ public class DomXmlList implements XDSelector, Iterable<XDSelector> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Iterate over this object using a Java iterator
 
-	public Iterator<XDSelector> iterator() {
+	public Iterator<XSelector> iterator() {
 		return new XIterator(this);
 	}
 	
@@ -103,7 +103,7 @@ public class DomXmlList implements XDSelector, Iterable<XDSelector> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select elements within this data object
 
-	public XDSelector select(String xpath) throws XDException {
+	public XSelector select(String xpath) throws XDException {
 		Node node = getCurrentNode();
 		if (node == null)
 			return null;
@@ -129,7 +129,7 @@ public class DomXmlList implements XDSelector, Iterable<XDSelector> {
 	//--------------------------------------------------------------------------------------------------------------------
 	// Select and iterate using a Java iterator
 	
-	public Iterable<XDSelector> foreach(String xpath) throws XDException {
+	public Iterable<XSelector> foreach(String xpath) throws XDException {
 		return getNodes(xpath);
 	}
 	

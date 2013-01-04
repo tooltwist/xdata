@@ -13,7 +13,7 @@ import com.tooltwist.fastXml.FastXml;
 import com.tooltwist.xdata.XD;
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XDIncompatibleFormatException;
-import com.tooltwist.xdata.XDSelector;
+import com.tooltwist.xdata.XSelector;
 
 
 public class XD_Test {
