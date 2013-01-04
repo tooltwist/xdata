@@ -167,10 +167,11 @@ public abstract class StandardTestCases {
 		XSelector data = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 		
 		// Accessing single fields
-		Misc.checkXpathValue(data, "/*/country[1]/name", "Australia");
-		Misc.checkXpathValue(data, "/*/country[2]/name", "New Zealand");
-		Misc.checkXpathValue(data, "/*/country[1]/state[1]/abbreviation", "NSW");
-		Misc.checkXpathValue(data, "/*/country[2]/state[2]/abbreviation", "SI");
+		// Reminder - indexes start at zero, not at 1 as with XML XPaths.
+		Misc.checkXpathValue(data, "/*/country[0]/name", "Australia");
+		Misc.checkXpathValue(data, "/*/country[1]/name", "New Zealand");
+		Misc.checkXpathValue(data, "/*/country[0]/state[0]/abbreviation", "NSW");
+		Misc.checkXpathValue(data, "/*/country[1]/state[1]/abbreviation", "SI");
 	}
 
 	@Test
@@ -180,29 +181,29 @@ public abstract class StandardTestCases {
 		XSelector data = new XD(INPUT_DATA()).getSelector(DATA_TYPE());
 		
 		// Check selecting state/city via country
-		XSelector cities = data.select("/*/country[1]/state[1]/city");
+		XSelector cities = data.select("/*/country[0]/state[0]/city");
 		assertEquals("Expected countries.size() to be 4", 4, cities.size());
 
-		cities = data.select("/*/country[1]/state[2]/city");
+		cities = data.select("/*/country[0]/state[1]/city");
 		assertEquals("Expected countries.size() to be 4", 4, cities.size());
 
-		cities = data.select("/*/country[2]/state[1]/city");
+		cities = data.select("/*/country[1]/state[0]/city");
 		assertEquals("Expected countries.size() to be 2", 2, cities.size());
 
-		cities = data.select("/*/country[2]/state[2]/city");
+		cities = data.select("/*/country[1]/state[1]/city");
 		assertEquals("Expected countries.size() to be 2", 2, cities.size());
 
 		// Selecting state/city - all countries at once
+		cities = data.select("/*/country/state[0]/city");
+		assertEquals("Expected countries.size() to be 6", 6, cities.size());
+		
 		cities = data.select("/*/country/state[1]/city");
 		assertEquals("Expected countries.size() to be 6", 6, cities.size());
 		
 		cities = data.select("/*/country/state[2]/city");
-		assertEquals("Expected countries.size() to be 6", 6, cities.size());
-		
-		cities = data.select("/*/country/state[3]/city");
 		assertEquals("Expected countries.size() to be 0", 0, cities.size());
 		
-		cities = data.select("/*/country/state[4]/city");
+		cities = data.select("/*/country/state[3]/city");
 		assertEquals("Expected countries.size() to be 0", 0, cities.size());		
 	}
 
@@ -533,6 +534,8 @@ public abstract class StandardTestCases {
 	// Numeric values
 	
 	// setCurrentIndex()
+	
+	// invalid selection paths
 	
 	// To Document - known inconsistencies:
 	//    xml-dom, xml-fast: selection of a parent node (DOM returns spaces around children, FAST returns contents of children)
