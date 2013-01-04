@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XIterator;
@@ -14,7 +14,7 @@ import com.tooltwist.xdata.XDCallback;
 import com.tooltwist.xdata.XSelector;
 
 /**
- * This class is used to provide high speed XML access. In particular, it avoids creating large numbers of XML objects, like the DOM parser. This parser does not provide comprehensive XPATH or DOM operations. If attempts to use complex XPATHS are attempted, a FastXmlBeyondCapabilityException will be thrown.
+ * This class is used to provide high speed XML access. In particular, it avoids creating large numbers of XML objects, like the DOM parser. This parser does not provide comprehensive XPATH or DOM operations.
  * 
  * @author philipcallender
  * @see com.dinaa.XData
@@ -35,6 +35,12 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 	private int offset;
 	private int lineCnt;
 	private int lineOffset;
+	
+	// A selection path, broken into segments.
+	protected class PathSegments {
+		String[] name;
+		int[] index;
+	};
 
 	public FastXml(String xml) throws FastXmlException {
 		init(xml.toCharArray());
@@ -660,7 +666,7 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 		return getText(parentNodeNum, xpath, 0);
 	}
 
-	public String getText(int parentNodeNum, String xpath, int occurance)// throws FastXmlException
+	public String getText(int parentNodeNum, String xpath, int occurance)
 	{
 		if (xpath == ".")
 			return getValue(parentNodeNum, true); // Need to remove escape sequences
@@ -679,11 +685,17 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 		// If the search starts with //, look anywhere below the start point
 		FastXmlNodes list = new FastXmlNodes(this);
 		if (xpath.startsWith("//")) {
+			// Look anywhere in the hierarchy
 			xpath = xpath.substring(2);
-			String parts[] = splitXPath(xpath);
+			PathSegments parts = splitSelectionPathIntoSegments(xpath);
+			if (parts == null)
+				return "";
 			findNodesAnywhereBelow(firstChildNodeNum, childIndent, parts, 0, list, occurance);
 		} else {
-			String parts[] = splitXPath(xpath);
+			// Look at the specific path
+			PathSegments parts = splitSelectionPathIntoSegments(xpath);
+			if (parts == null)
+				return "";
 			findNodes(firstChildNodeNum, childIndent, parts, 0, 0, list, occurance);
 		}
 
@@ -710,11 +722,17 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 
 		FastXmlNodes list = new FastXmlNodes(this);
 		if (xpath.startsWith("//")) {
+			// Look anywhere in the hierarchy
 			xpath = xpath.substring(2);
-			String parts[] = splitXPath(xpath);
+			PathSegments parts = splitSelectionPathIntoSegments(xpath);
+			if (parts == null)
+				return null;
 			findNodesAnywhereBelow(firstChildNodeNum, childIndent, parts, 0, list, -1);
 		} else {
-			String parts[] = splitXPath(xpath);
+			// Look at the specific path
+			PathSegments parts = splitSelectionPathIntoSegments(xpath);
+			if (parts == null)
+				return null;
 			findNodes(firstChildNodeNum, childIndent, parts, 0, 0, list, -1);
 		}
 		return list;
@@ -728,10 +746,10 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 	 * @param parts
 	 * @param cntMatches
 	 * @param list
-	 * @param occurrance
+	 * @param occurrence
 	 * @return
 	 */
-	private int findNodesAnywhereBelow(int childNodeNum, int requiredIndent, String parts[], int cntMatches, FastXmlNodes list, int occurrance) {
+	private int findNodesAnywhereBelow(int childNodeNum, int requiredIndent, PathSegments parts, int cntMatches, FastXmlNodes list, int occurrence) {
 		if (childNodeNum >= numNodes)
 			return cntMatches;
 
@@ -743,57 +761,117 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 
 			int indent = block.indent[index];
 			if (indent != requiredIndent)
-				return cntMatches;
+				return cntMatches; // This will happen if the parent node has no children.
 
 			// Look for a match at this node
-			cntMatches = findNodes(childNodeNum, requiredIndent, parts, 0, cntMatches, list, occurrance);
+			cntMatches = findNodes(childNodeNum, requiredIndent, parts, 0, cntMatches, list, occurrence);
 			if (cntMatches < 0)
-				return -1; // Found the occurrance we are after
+				return -1; // Found the occurrence we are after
 
 			// Look for matches within the children
-			cntMatches = findNodesAnywhereBelow(childNodeNum + 1, requiredIndent + 1, parts, cntMatches, list, occurrance);
+			cntMatches = findNodesAnywhereBelow(childNodeNum + 1, requiredIndent + 1, parts, cntMatches, list, occurrence);
 			if (cntMatches < 0)
-				return -1; // Found the occurrance we are after
+				return -1; // Found the occurrence we are after
 
 			// Move on to the next child
 			childNodeNum = block.nextNodeAtThisLevel[index];
 		}
 	}
 
-	/*
-	 * This method needs to work iteratively - a recursive method would need to return the results and also
+	/**
+	 * The method recursively searches for nodes that match the specified selection path / occurrence.
+	 * 
+	 * Each time this method is called, it checks the nodes under a parent against a specific segment. The
+	 * <code>childNodeNum</code> specifies the first of the child nodes (which has an indent of
+	 * <code>requiredIndent</code>). The code loops around for each of the child nodes, checking the
+	 * following:
+	 * 
+	 * [1] Does the name match the current segment? (exact match or *)
+	 * 
+	 * [2] Does the index match the required index for this segment? (exact match or -1)
+	 * 
+	 * [3] If further segments need to be matched, check the children of the node next segment of the path again.
+	 * 
+	 * [4] If there are no further path segments to be checked, the node is a match.
+	 * 
+	 * [5] If requiredOccurance is not specified, and the node to the list and continue checking.
+	 * 
+	 * [6] If the requiredOccurrance is specified, and totalMatches equals requiredOccurrence, we have a node we
+	 * 	need, so add it to the list and return -1.
+	 *  
+	 * Always return the total number of matches so far so we can keep count, except when the required
+	 * occurrence has been found (if it was specified), in which case return -1.
+	 *  
+	 * 
+	 * @param childNodeNum
+	 *  The first node at the new level. We'll skip from node to node at this level using node.next.
+	 * @param requiredIndent
+	 * 	The indent in FastJson in the depth in the hierarchy. It doesn't match up exactly with xpaths
+	 * 	because some node types (objects) jump down two levels.
+	 * @param segments
+	 * 	The segments making up the path.
+	 * @param segmentIndex
+	 * 	The index into segments that we are currently checking. This method is recursive. In the first
+	 * 	invocation, level should be zero.
+	 * @param totalMatches
+	 * 	The total number of matches of the full path that we've found so far. This is passed around through
+	 * 	the various recurring, so we can work out when a specific 'occurrence' has been reached.
+	 * @param list
+	 * 	The list to place the matching nodes into. 
+	 * @param requiredOccurrence
+	 * 	If non-negative, only place the occurrence'th node into <code>list</code>.
+	 *  @return
+	 *  	Total number of matches so far.
 	 */
-	protected int findNodes(int childNodeNum, int requiredIndent, String parts[], int level, int cntMatches, FastXmlNodes list, int occurrance) {
+	protected int findNodes(int childNodeNum, int requiredIndent, PathSegments segments, int segmentIndex, int totalMatches, FastXmlNodes list, int requiredOccurrence) {
 		if (childNodeNum >= numNodes)
-			return cntMatches;
+			return totalMatches;
 
-		for (;;) {
+		int cntNameMatch = -1;
+		for ( ; ; ) {
 			if (childNodeNum < 0)
-				return cntMatches;
+				return totalMatches;
 			FastXmlBlockOfNodes block = firstBlock.getBlock(childNodeNum, false);
 			int index = childNodeNum % FastXmlBlockOfNodes.SIZE;
 
 			int indent = block.indent[index];
 			String name = block.name[index];
 			if (indent != requiredIndent)
-				return cntMatches;
+				return totalMatches;
 
 			// See if the name matches the part of the XPATH at this level
-			if (name != null && (parts[level].equals("*") || parts[level].equals(name))) {
-				if (level == parts.length - 1) {
-					if (occurrance < 0)
-						list.addNode(childNodeNum);
-					else if (occurrance == cntMatches) {
-						list.addNode(childNodeNum);
-						return -1;
-					}
-					cntMatches++;
-				} else {
-					// Look at the next level down
-					cntMatches = findNodes(childNodeNum + 1, requiredIndent + 1, parts, level + 1, cntMatches, list, occurrance);
-					if (cntMatches < 0)
-						return cntMatches; // already found the required occurance
+			if (nameMatchesPathSegment(name, segments, segmentIndex))
+			{
+				// [1] The name matches.
+				cntNameMatch++;
+				
+				// See if the index matches
+				if (indexMatchesPathSegmentIndex(cntNameMatch, segments, segmentIndex)) {
+					
+					// [2] We have the right name and index
+					// Have we matched all the parts in the path?
+					if (haveMoreSegments(segments, segmentIndex)) {
 
+						// [3] We have more path segments to check.
+						// Check the children of this node against the next segment.
+						totalMatches = findNodes(childNodeNum + 1, requiredIndent + 1, segments, segmentIndex + 1, totalMatches, list, requiredOccurrence);
+						if (totalMatches < 0)
+							return totalMatches; // already found the required occurance
+	
+					} else {
+
+						// [4] We've matched name/index for all path segments.								
+						// See if this is the occurrence we're after.
+						if (requiredOccurrence < 0) {
+							// [5] We're accepting every occurrence.
+							list.addNode(childNodeNum);
+						} else if (requiredOccurrence == totalMatches) {
+							// [6] We have the occurrence we're after.
+							list.addNode(childNodeNum);
+							return -1;
+						}
+						totalMatches++;
+					}
 				}
 			}
 
@@ -802,7 +880,75 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 		}
 	}
 
-	protected String[] splitXPath(String xpath) {
+	private boolean nameMatchesPathSegment(String name, PathSegments segments, int segmentIndex) {
+		
+		if (name == null)
+			return false;
+
+		// Get the required segment name
+		String requiredName = segments.name[segmentIndex];
+
+		// The path segment matches any name
+		if (requiredName.equals("*"))
+			return true;
+		
+		// See if the name matches the path segment
+		if (name.equals(requiredName))
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Return true if this node matches the required index for this segment.
+	 * 
+	 * @param cntNameMatch
+	 * @param segments
+	 * @param segmentIndex
+	 * @return
+	 */
+	private boolean indexMatchesPathSegmentIndex(int cntNameMatch, PathSegments segments, int segmentIndex) {
+		
+		// If no index was provided, match all nodes with the right name (segment="abc")
+		int requiredIndex = segments.index[segmentIndex];
+		if (requiredIndex < 0)
+			return true;
+		
+		// See if we have the requested index (segment="abc[123]")
+		if (cntNameMatch == requiredIndex)
+			return true;
+		
+		return false;
+	}
+
+	/**
+	 * Return true if there are more segments in the path after this segment.
+	 * 
+	 * @param segments
+	 * @param segmentIndex
+	 * @return
+	 */
+	private boolean haveMoreSegments(PathSegments segments, int segmentIndex) {
+		return (segmentIndex < (segments.name.length - 1));
+	}
+
+	/**
+	 * Split a selection path into segments.
+	 * For example "/abc/def[123]/ghi" becomes two arrays:
+	 * 	name = [ "abc", "def", "ghi"
+	 * 	index = [ -1, 123, -1 ]
+	 * 
+	 * <p>
+	 * This object avoids using a list of {name,index} because we're shooting for speed
+	 * (trying to minimize collection traversal) and trying to reduce object creation.
+	 * 
+	 * @param xpath
+	 * 	A selection path (eg. "/abc/def[123]")
+	 * @return
+	 * 	A PathSegments object, containing the names and indexes, or null if the path is invalid.
+	 */
+	protected PathSegments splitSelectionPathIntoSegments(String xpath)
+	{
 		// Ignore any initial '/'
 		if (xpath.startsWith("/"))
 			xpath = xpath.substring(1);
@@ -811,24 +957,80 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 		if (xpath.startsWith("./"))
 			xpath = xpath.substring(2);
 
-		Vector<String> list = new Vector<String>();
-		for (;;) {
-			int pos = xpath.indexOf("/");
-			if (pos < 0) {
-				list.add(xpath);
-				break;
+		// Split the path into segments, placing the name and index of each segment into a list.
+		List<String> nameList = new ArrayList<String>();
+		List<Integer> indexList = new ArrayList<Integer>();
+		try {
+			for ( ; ; )
+			{
+				int pos = xpath.indexOf("/");
+				if (pos < 0)
+				{
+					splitSegment(xpath, nameList, indexList);
+					break;
+				}
+				String segment = xpath.substring(0, pos);
+				xpath = xpath.substring(pos + 1);
+				splitSegment(segment, nameList, indexList);
 			}
-			String part = xpath.substring(0, pos);
-			list.add(part);
-			xpath = xpath.substring(pos + 1);
+		} catch (XDException e) {
+			return null;
 		}
-		String arr[] = new String[list.size()];
-		Enumeration<String> enumx = list.elements();
-		for (int i = 0; enumx.hasMoreElements(); i++) {
-			String part = (String) enumx.nextElement();
-			arr[i] = part;
+		
+		// Convert the name and index lists into a single PathSegments object.
+		PathSegments segments = new PathSegments();
+		int numSegments = nameList.size();
+		segments.name = new String[numSegments];
+		segments.index = new int[numSegments];
+		for (int i = 0; i < numSegments; i++) {
+			String name = nameList.get(i);
+			Integer index = indexList.get(i);
+			
+			segments.name[i] = name;
+			segments.index[i] = index.intValue();
 		}
-		return arr;
+		return segments;
+	}
+	
+	/**
+	 * Split a string like abc[123] into it's name and index components, and add each to the provided lists.
+	 * 
+	 * @param segment
+	 * @param nameList
+	 * @param indexList
+	 * @throws XDException 
+	 */
+	private void splitSegment(String segment, List<String> nameList, List<Integer> indexList) throws XDException {
+		
+		// See if an array index is specified.
+		int pos = segment.indexOf('[');
+		String name;
+		int index;
+		if (pos < 0) {
+			// no index is provided, use an index of -1 to indicate no index.
+			name = segment;
+			index = -1;
+		} else {
+			// Split the segment into name and index.
+			name = segment.substring(0, pos);
+			String tmp = segment.substring(pos + 1);
+			if ( !tmp.endsWith("]"))
+				throw new XDException("Invalid index in selection path (" + segment + ")");
+			tmp = tmp.substring(0, tmp.length() - 1);
+			
+			// Parse the integer and chec it's valid
+			try {
+				index = Integer.parseInt(tmp);
+			} catch (NumberFormatException e) {
+				index = -1; // force an error
+			}
+			if (index < 0)
+				throw new XDException("Invalid index in selection path (" + segment + ")");
+		}
+		
+		// Add the name and index to the provided lists
+		nameList.add(name);
+		indexList.add(new Integer(index));
 	}
 
 	public String getXml() {
