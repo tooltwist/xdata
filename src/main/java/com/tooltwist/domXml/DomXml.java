@@ -255,44 +255,52 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * Get a list of nodes that match the specified XPATH.
 	 * 
 	 * @return A list of nodes that match the XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
+	 * @param path
+	 *            An selection path string to be matched.
 	 * @see getXpathNode
 	 */
-	public DomXmlList getNodes(String xpath) throws XDException {
-		NodeList nl = getNodeList(xpath);
+	public DomXmlList getNodes(String path) throws XDException {
+		NodeList nl = getNodeList(path);
 		return new DomXmlList(nl, this);
 	}
 
 	/**
-	 * Get a list of nodes that match the specified XPATH, starting the search from a specific DOM node.
+	 * Get a list of nodes that match the specified selection path, starting the search from a specific DOM node.
 	 * 
-	 * @return A list of nodes that match the XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
+	 * @return A list of nodes that match the selection path.
+	 * @param path
+	 *            A selection path string to be matched.
 	 * @param target
-	 *            A node from which to start matching the XPath.
+	 *            A node from which to start matching the path.
 	 * @throws XDException 
 	 * @see getXpathNode
 	 */
-	public DomXmlList getNodes(String xpath, Node target) throws XDException {
-		NodeList nl = getNodeList(xpath, target);
+	public DomXmlList getNodes(String path, Node target) throws XDException {
+		NodeList nl = getNodeList(path, target);
 		return new DomXmlList(nl, this);
 	}
 
 	/**
-	 * Get a node that matches a specified XPATH. This method returns the index'th node that matches the provided XPath. If no suitable node can be found, return null.
-	 * 
-	 * @return The index'th nodes that matches the specified XPath.
+	 * Get a node that matches a specified selection path.
+	 */
+	public NodeList getNodeList(String path) throws XDException {
+		
+		String xpath = convertSelectionPathToXpath(path);
+		return getNodeListWithW3cXpath(xpath);
+	}
+
+	/**
+	 * Get a node that matches a specified DOM XPath.
+	 * <p>
+	 * This differs from {@link #getNodeList(String)} in that it supports full W3C XPaths (see http://www.w3.org/TR/xpath/).
+	 * <p>
+	 * Note that W3C XPath indexes start with an index of one (e.g. "/data/country[1]").
+	 * <p>
 	 * @param xpath
 	 *            An XPath string to be matched.
-	 * @param index
-	 *            Which node to return.
-	 * @see getXpathNode
 	 */
-	public NodeList getNodeList(String xpath) throws XDException {
-//		if (traceName != null)
-//			logger.debug("XData[" + traceName + "].getNode(String xpath)");
+	public NodeList getNodeListWithW3cXpath(String xpath) throws XDException {
+		
 		try {
 			//PrefixResolver prefixResolver = getPrefixResolver();
 			PrefixResolver prefixResolver = new PrefixResolverDefault(document.getDocumentElement());
@@ -317,18 +325,102 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	}
 
 	/**
-	 * Get a node that matches a specified XPATH below a specifed starting point. This method returns the index'th node that matches the provided XPath. If no suitable node can be found, return null.
+	 * Convert an XData selection path to a DOM XPath.
+	 * <p>
+	 * This involves incrementing each index position, because XPath indexes start at 1.
+	 * For example "/abc/def[123]" becomes "/abc/def[124]". Anything that is not understood is simply ignored.
 	 * 
-	 * @return The index'th nodes that matches the specified XPath.
+	 * @param selectionPath
+	 * @return
+	 */
+	private String convertSelectionPathToXpath(String selectionPath) {
+		
+		StringBuilder xpath = new StringBuilder();
+		for (String tmp = selectionPath; ; ) {
+			int pos = tmp.indexOf('[');
+			if (pos < 0) {
+				xpath.append(tmp);
+				break;
+			}
+			
+			// Have [....
+			String prefix = tmp.substring(0, pos);
+			tmp = tmp.substring(pos + 1); // everything after '['
+			xpath.append(prefix);
+			
+			// Check for a ']'
+			pos = tmp.indexOf(']');
+			if (pos < 0) {
+				// There's nothing past here we can understand
+				xpath.append('[');
+				xpath.append(tmp);
+				break;
+			}
+			
+			// Get the index part
+			String index = tmp.substring(0, pos);
+			tmp = tmp.substring(pos + 1);
+			
+			// If the index is a simple number, increment it's value.
+			if (isAllDigits(index)) {
+				try {
+					int intIndex = Integer.parseInt(index);
+					intIndex++;
+					index = Integer.toString(intIndex);
+				} catch (NumberFormatException e) {
+					// Can't happen
+				}
+			}
+			
+			// Add the new index to the xpath
+			xpath.append('[');
+			xpath.append(index);
+			xpath.append(']');
+			
+		}
+		return xpath.toString();
+	}
+
+	/**
+	 * Check a string contains only digits (0-9)
+	 * @param str
+	 * @return
+	 */
+	private boolean isAllDigits(String str) {
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			if ( !Character.isDigit(c)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Get a list of nodes that match the path below a specified starting point.
 	 * @param xpath
 	 *            An XPath string to be matched.
-	 * @param index
-	 *            Which node to return.
 	 * @param target
 	 *            The place from which to start the search.
-	 * @see getXpathNodeList
+	 * @see #select(String)
 	 */
-	public NodeList getNodeList(String xpath, Node target) throws XDException {
+	public NodeList getNodeList(String selectionPath, Node target) throws XDException {
+		
+		String xpath = convertSelectionPathToXpath(selectionPath);
+		return getNodeListWithW3cXpath(xpath, target);
+	}
+
+	/**
+	 * Get a node that matches a specified W3C XPath, below a specified starting point.
+	 * <p>
+	 * This differs from {@link #getNodeList(String, Node)} in that it supports full W3C defined XPaths (see http://www.w3.org/TR/xpath/).
+	 * <p>
+	 * Note that W3C XPath indexes start with an index of one (e.g. "/data/country[1]").
+	 * <p>
+	 * @param xpath
+	 *            An XPath string to be matched.
+	 */
+	public NodeList getNodeListWithW3cXpath(String xpath, Node target) throws XDException {
 		try {
 			// XPathContext xpathSupport = new XPathContext();
 			
@@ -352,14 +444,7 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	}
 
 	/**
-	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point. IMPORTANT: Assumes that initialiseXpath has already been called.
-	 * 
-	 * @return The text contained in the first node that matches the specified XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
-	 * @param target
-	 *            The place from which to start the search.
-	 * @see getXpathNodeList
+	 * Return the text from the first node that contains text.
 	 */
 	private String getTextFromNodeList(NodeList nodelist) // throws TransformerException
 	{
@@ -388,18 +473,17 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	}
 
 	/**
-	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point.
+	 * Return the text value in the first node that matches a specified selection path below a specified starting point.
 	 * 
 	 * @return The text contained in the first node that matches the specified XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
+	 * @param path
+	 *            An selection path to be matched.
 	 * @param target
 	 *            The place from which to start the search.
 	 * @throws XDException 
-	 * @see getXpathNodeList
 	 */
-	public String getText(String xpath, Node target) throws XDException {
-		NodeList nl = getNodeList(xpath, target);
+	public String getText(String path, Node target) throws XDException {
+		NodeList nl = getNodeList(path, target);
 		return getTextFromNodeList(nl);
 	}
 
@@ -408,8 +492,8 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	// Methods for the XDSelector interface
 
 	@Override
-	public String getString(String xpath) throws XDException {
-		NodeList nl = getNodeList(xpath);
+	public String getString(String path) throws XDException {
+		NodeList nl = getNodeList(path);
 		String text = getTextFromNodeList(nl);
 		return text;
 	}
@@ -507,16 +591,16 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 
 	
 	//--------------------------------------------------------------------------------------------------------------------
-	// Selections relative to this object, using an xpath.
+	// Selections relative to this object, using an selection path.
 	
-	public XSelector select(String xpath) throws XDException {
-		NodeList nl = getNodeList(xpath);
+	public XSelector select(String path) throws XDException {
+		NodeList nl = getNodeList(path);
 		return new DomXmlList(nl, this);
 	}
 
-	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
+	public void foreach(String path, Object userData, XDCallback callback) throws XDException {
 		try {
-			XSelector list = this.getNodes(xpath);
+			XSelector list = this.getNodes(path);
 			for (int index = 0; list.next(); index++) {
 				callback.next(list, index, userData);
 			}		
@@ -527,13 +611,13 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 		}
 	}
 
-	public void foreach(String xpath, XDCallback callback) throws XDException {
-		foreach(xpath, null, callback);
+	public void foreach(String path, XDCallback callback) throws XDException {
+		foreach(path, null, callback);
 	}
 
-	public Iterable<XSelector> foreach(String xpath) throws XDException {
+	public Iterable<XSelector> foreach(String path) throws XDException {
 		try {
-			return getNodes(xpath);
+			return getNodes(path);
 		} catch (Exception e) {
 			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
@@ -600,23 +684,24 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 		parentXD.invalidateAllSelectorsExcept(this);
 	}
 
-	public void insert(Node root, String xpath, XD xd) throws XDException {
+	public void insert(Node root, String path, XD xd) throws XDException {
 		// Check that the tag exists
-		Node parent = checkElementExists(root, xpath);
+		Node parent = checkElementExists(root, path);
 		if (parent == null || !(parent instanceof Element))
-			throw new XDException("xpath does not resolve to an Element: " + xpath);
+			throw new XDException("Selection path does not resolve to an Element: " + path);
 
 		createChild((Element) parent, xd);
 		notifyDocumentChanged();
 	}
 
 	/**
-	 * Find the node that matches a specified XPATH, starting at <code>root</code>.
+	 * Find the node that matches a specified selection path, starting at <code>root</code>.
 	 * If no suitable node can be found, create a new element.
 	 */
-	private Node checkElementExists(Node root, String xpath) throws XDException {
-//		if (traceName != null)
-//			logger.debug("XData[" + traceName + "].checkElementExists(Node root, xpath=" + xpath + ")");
+	private Node checkElementExists(Node root, String path) throws XDException {
+		
+		// Convert the selection path to a W3C XPath. 
+		String xpath = convertSelectionPathToXpath(path);
 
 		try {
 			// Select the list of nodes
@@ -681,11 +766,11 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 		parent.appendChild(newNode);
 	}
 
-	public void insert(Node root, String xpath, Node childNode) throws XDException {
+	public void insert(Node root, String path, Node childNode) throws XDException {
 		// Check that the tag exists
-		Node parent = checkElementExists(root, xpath);
+		Node parent = checkElementExists(root, path);
 		if (parent == null || !(parent instanceof Element))
-			throw new XDException("XData.createChild: xpath does not resolve to an Element");
+			throw new XDException("Selection path does not resolve to an Element");
 
 		createChild((Element) parent, childNode);
 		notifyDocumentChanged();
@@ -800,19 +885,19 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	}
 
 	/**
-	 * Select nodes from one XData using an XPath, and insert them into this XData directly beneath the node with a
-	 * specified XPath/index. The nodes are not removed from the source XData.
+	 * Select nodes from one XData using a selection path, and insert them into this XData directly beneath the node with a
+	 * specified path/index. The nodes are not removed from the source XData.
 	 * 
-	 * @param destinationXpath
+	 * @param destinationPath
 	 * @param destinationIndex
 	 * @param sourceXml
 	 * @param sourcePath
 	 * @throws XDException 
 	 * @throws XDataException
 	 */
-	public void insert(String destinationXpath, int destinationIndex, XD sourceXml, String sourcePath) throws XDException {
+	public void insert(String destinationPath, int destinationIndex, XD sourceXml, String sourcePath) throws XDException {
 		// Copy the input to this module into the exitData element (used to return from the linked module)
-		Node destinationNode = this.getNode(destinationXpath, destinationIndex);
+		Node destinationNode = this.getNode(destinationPath, destinationIndex);
 		
 		DomXml selector = (DomXml) sourceXml.getSelector("xml-dom");
 		NodeList nodeList = selector.getNodeList(sourcePath);
@@ -826,42 +911,42 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	}
 
 	/**
-	 * Get a node that matches a specified XPATH. This method returns the index'th node that matches the provided XPath.
+	 * Get a node that matches a specified selection path.
+	 * <p>
+	 * This method returns the index'th node that matches the provided XPath.
 	 * If no suitable node can be found, return null.
 	 * 
-	 * @return The index'th nodes that matches the specified XPath.
-	 * @param xpath
+	 * @param path
 	 *            An XPath string to be matched.
 	 * @param index
 	 *            Which node to return.
+	 * @return The index'th node that matches the specified XPath.
 	 * @throws XDException 
-	 * @see getXpathNode
 	 */
-	public Node getNode(String xpath, int index) throws XDException {
-		NodeList nodeList = getNodeList(xpath);
+	public Node getNode(String path, int index) throws XDException {
+		NodeList nodeList = getNodeList(path);
 		if (index < 0 || index >= nodeList.getLength())
-			throw new XDNotFoundException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+			throw new XDNotFoundException("no node with the specified index: getNode(\"" + path + "\", " + index + ")");
 		return nodeList.item(index);
 	}
 
 	/**
-	 * Get a node that matches a specified XPATH below a specified starting point. This method returns the index'th node
-	 * that matches the provided XPath. If no suitable node can be found, return null.
+	 * Get a node that matches a specified selection path below a specified starting point. This method returns the index'th node
+	 * that matches the provided path. If no suitable node can be found, return null.
 	 * 
-	 * @return The index'th nodes that matches the specified XPath.
-	 * @param xpath
+	 * @param path
 	 *            An XPath string to be matched.
 	 * @param index
 	 *            Which node to return.
 	 * @param target
 	 *            The place from which to start the search.
+	 * @return The index'th node that matches the specified XPath.
 	 * @throws XDException 
-	 * @see getXpathNodeList
 	 */
-	public Node getNode(String xpath, Node target, int index) throws XDException {
-		NodeList nl = getNodeList(xpath, target);
+	public Node getNode(String path, Node target, int index) throws XDException {
+		NodeList nl = getNodeList(path, target);
 		if (index < 0 || index >= nl.getLength())
-			throw new XDException("no node with the specified index: getNode(\"" + xpath + "\", " + index + ")");
+			throw new XDException("no node with the specified index: getNode(\"" + path + "\", " + index + ")");
 		return nl.item(index);
 	}
 
@@ -869,42 +954,42 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * Insert a node into this XData object at a specified position. Extra nodes will be added to create the parent if
 	 * required.
 	 * 
-	 * @param xpath
-	 *            The xpath for the parent node.
+	 * @param path
+	 *            The selection path for the parent node.
 	 * @param childNode
 	 *            The new node to be added.
 	 */
-	public void insert(String xpath, Node childNode) throws XDException {
+	public void insert(String path, Node childNode) throws XDException {
 		// Check that the tag exists
 		Node root = document.getDocumentElement();
-		insert(root, xpath, childNode);
+		insert(root, path, childNode);
 	}
 
 	/**
 	 * Replace the text value of a node within the XML.
 	 * @throws XDException 
 	 */
-	public void replace(String xpath, String value) throws XDException {
+	public void replace(String path, String value) throws XDException {
 		// Check that the tag exists
 		Node root = document.getDocumentElement();
-		replace(root, xpath, value);
+		replace(root, path, value);
 	}
 
 	/**
 	 * Replace the a node within an XML document with a node from another document.
 	 * @throws XDException 
 	 */
-	public void replace(String xpath, XD sourceData, String srcXpath) throws XDException {
+	public void replace(String path, XD sourceData, String srcPath) throws XDException {
 		// Find the node in the source
 		DomXml domXml = (DomXml) sourceData.getSelector("xml-dom");
 		Document srcDoc = domXml.getDocument();
 		Node srcRoot = srcDoc.getDocumentElement();
-		Node srcNode = checkElementExists(srcRoot, srcXpath);
+		Node srcNode = checkElementExists(srcRoot, srcPath);
 
 		// Find the node in the destination
 		Document destDoc = this.getDocument();
 		Node destRoot = destDoc.getDocumentElement();
-		Node destNode = checkElementExists(destRoot, xpath);
+		Node destNode = checkElementExists(destRoot, path);
 
 		// Delete the existing node
 		Node nextSibling = destNode.getNextSibling();
@@ -923,15 +1008,15 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * 
 	 * @param root
 	 *            Root of the tree.
-	 * @param xpath
+	 * @param path
 	 *            Position of the node to be replaced.
 	 * @param value
 	 *            If null, the node is removed, not replaced.
 	 * @throws XDException
 	 */
-	public void replace(Node root, String xpath, String value) throws XDException {
+	public void replace(Node root, String path, String value) throws XDException {
 		// Check that the tag exists
-		Node parent = checkElementExists(root, xpath);
+		Node parent = checkElementExists(root, path);
 
 		// Delete any existing child nodes
 		for ( ; ; ) {
@@ -953,47 +1038,46 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * Insert all the nodes within another XD object into this XD object. Extra nodes will be added to create the
 	 * parent if required.
 	 * 
-	 * @param xpath
-	 *            The xpath for the node under which the document will be added.
+	 * @param path
+	 *            The selection path for the node under which the document will be added.
 	 * @param data
 	 *            The document to be inserted.
 	 */
-	public void insert(String xpath, XD xd) throws XDException {
+	public void insert(String path, XD xd) throws XDException {
 		// Check that the tag exists
 		Node root = document.getDocumentElement();
-		insert(root, xpath, xd);
+		insert(root, path, xd);
 	}
 
 	/**
-	 * Sort the elements in this data. The <i>xPath</i> parameter is the path to the element to be sorted. The sortFields
-	 * parameter specifies the value(s) used to specify the sort order. This <i>SortFields</i> may contain multiple
-	 * element names, separated by semicolons. A '#' before a name indicates that it should be treated as numeric.
+	 * Sort elements within the data.<p>
 	 * <p>
 	 * Note that this method will force conversion to 'xml-dom', with the associated cost of parsing, etc. 
 	 * 
-	 * @param parentXPath
-	 * 		The element above the elements that will be sorted.
+	 * @param parentPath
+	 * 		Defines the immediate parent of the records to be sorted.
 	 * @param elementName
 	 * 		The name of the elements to be sorted.
 	 * @param sortFields
-	 * 		Fields within the element that will be used to determine the ordering.
+	 * 		A list of fields within the element that will be used to determine the ordering, separated by semicolons.
+	 * 		A '#' before a field name indicates that it should be treated as numeric.
 	 * @param isAscending
 	 * 		Sort in increasing or decreasing order.
 	 * @throws XDException 
 	 */
-	public void sortElements(String parentXPath, String elementName, String sortFields, boolean isAscending) throws XDException {
+	public void sortElements(String parentPath, String elementName, String sortFields, boolean isAscending) throws XDException {
 		if (elementName == null || elementName.equals("")) {
-			int index = parentXPath.lastIndexOf("/");
+			int index = parentPath.lastIndexOf("/");
 			if (index < 0) {
-				elementName = parentXPath;
-				parentXPath = null;
+				elementName = parentPath;
+				parentPath = null;
 			} else {
-				elementName = parentXPath.substring(index + 1);
-				parentXPath = parentXPath.substring(0, index);
+				elementName = parentPath.substring(index + 1);
+				parentPath = parentPath.substring(0, index);
 			}
 		}
-		if (parentXPath == null || parentXPath.equals(""))
-			parentXPath = "/*";
+		if (parentPath == null || parentPath.equals(""))
+			parentPath = "/*";
 
 		// Break the sort field string into separate parts
 		Vector<String> sortFieldsList = new Vector<String>();
@@ -1024,7 +1108,7 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 		}
 
 		// Find all the parent nodes
-		DomXmlList parents = this.getNodes(parentXPath);
+		DomXmlList parents = this.getNodes(parentPath);
 		while (parents.next()) {
 			Node parentNode = parents.getCurrentNode();
 			DomXmlList children = parents.getNodes(elementName);
@@ -1078,32 +1162,35 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	}
 
 	/**
-	 * Return the value of the first node that matches a specified XPATH below the element specified by <code>target</code>.
+	 * Return the value of the first node that matches a specified selection path below the element specified by <code>target</code>.
 	 * 
 	 * @return The text contained in the first node that matches the specified XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
+	 * @param path
+	 *            An selection path to be matched.
 	 * @param target
 	 *            The place from which to start the search.
 	 * @see getXpathNodeList
 	 */
-	public String getString(String xpath, Node target) throws XDException {
-		NodeList nl = getNodeList(xpath, target);
+	public String getString(String path, Node target) throws XDException {
+		NodeList nl = getNodeList(path, target);
 		return getTextFromNodeList(nl);
 	}
 
 	/**
-	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point.
+	 * Return the text value in the first node that matches a specified selection path below a specified starting point.
 	 * 
-	 * @return The text contained in the first node that matches the specified XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
+	 * @param path
+	 *            An selection path to be matched.
 	 * @param target
 	 *            The place from which to start the search.
+	 * @return The text contained in the first node that matches the specified path.
 	 * @throws XDException 
-	 * @see getXpathNodeList
 	 */
-	public String getString(String xpath, Node target, int index) throws XDException {
+	public String getString(String path, Node target, int index) throws XDException {
+
+		// Convert to a W3C XPath
+		String xpath = convertSelectionPathToXpath(path);
+		
 		try {
 			XPathContext xpathSupport = new XPathContext();
 			// XPathContext xpathSupport = hidden.getRootXPathContext(); ZZZZZZZZZ This might be better

@@ -965,8 +965,6 @@ System.out.println(new String(json, offset, json.length-offset));
 		return text;
 	}
 
-	//ZZZZZQQQ Make this work
-
 	public String getText(int parentNodeNum, String xpath, int occurance)
 	{
 		if (xpath == ".")
@@ -1032,6 +1030,7 @@ System.out.println(new String(json, offset, json.length-offset));
 		FastJsonNodes list = new FastJsonNodes(this);
 		if (xpath.startsWith("//"))
 		{
+			// Look anywhere in the hierarchy
 			xpath = xpath.substring(2);
 			PathSegments parts = splitSelectionPathIntoSegments(xpath);
 			if (parts == null)
@@ -1040,6 +1039,7 @@ System.out.println(new String(json, offset, json.length-offset));
 		}
 		else
 		{
+			// Look at the specific path
 			PathSegments parts = splitSelectionPathIntoSegments(xpath);
 			if (parts == null)
 				return null;
@@ -1057,10 +1057,10 @@ System.out.println(new String(json, offset, json.length-offset));
 	 * @param parts
 	 * @param cntMatches
 	 * @param list
-	 * @param occurrance
+	 * @param occurrence
 	 * @return
 	 */
-	private int findNodesAnywhereBelow(int childNodeNum, int requiredIndent, PathSegments parts, int cntMatches, FastJsonNodes list, int occurrance)
+	private int findNodesAnywhereBelow(int childNodeNum, int requiredIndent, PathSegments parts, int cntMatches, FastJsonNodes list, int occurrence)
 	{
 		if (childNodeNum >= numNodes)
 			return cntMatches;
@@ -1074,17 +1074,17 @@ System.out.println(new String(json, offset, json.length-offset));
 
 			int indent = block.indent[index];
 			if (indent != requiredIndent)
-				return cntMatches;
+				return cntMatches; // This will happen if the parent node has no children.
 
 			// Look for a match at this node
-			cntMatches = findNodes(childNodeNum, requiredIndent, parts, 0, cntMatches, list, occurrance);
+			cntMatches = findNodes(childNodeNum, requiredIndent, parts, 0, cntMatches, list, occurrence);
 			if (cntMatches < 0)
-				return -1; // Found the occurrance we are after
+				return -1; // Found the occurrence we are after
 
 			// Look for matches within the children
-			cntMatches = findNodesAnywhereBelow(childNodeNum+1, requiredIndent+1, parts, cntMatches, list, occurrance);
+			cntMatches = findNodesAnywhereBelow(childNodeNum+1, requiredIndent+1, parts, cntMatches, list, occurrence);
 			if (cntMatches < 0)
-				return -1; // Found the occurrance we are after
+				return -1; // Found the occurrence we are after
 			
 			// Move on to the next child
 			childNodeNum = block.nextNodeAtThisLevel[index];
@@ -1092,7 +1092,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	}
 
 	/**
-	 * The method recursively searches for nodes that match the specified xpath / occurrence.
+	 * The method recursively searches for nodes that match the specified selection path / occurrence.
 	 * 
 	 * Each time this method is called, it checks the nodes under a parent against a specific segment. The
 	 * <code>childNodeNum</code> specifies the first of the child nodes (which has an indent of
@@ -1150,7 +1150,6 @@ System.out.println(new String(json, offset, json.length-offset));
 			int index = childNodeNum % FastJsonBlockOfNodes.SIZE;
 
 			int indent = block.indent[index];
-//			String name = block.name[index];
 			int type = block.type[index];
 			int offsetOfName = block.offsetOfName[index];
 			if (indent != requiredIndent)
@@ -1288,11 +1287,11 @@ System.out.println(new String(json, offset, json.length-offset));
 		// The node has no name
 		if (offsetOfNodeName < 0)
 			return false;
-		
+
 		// Get the required segment name
 		String requiredName = segments.name[segmentIndex];
-		
-		// The part matches any name
+
+		// The path segment matches any name
 		if (requiredName.equals("*"))
 			return true;
 		
@@ -1328,7 +1327,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	 * @return
 	 */
 	private boolean indexMatchesPathSegmentIndex(int cntNameMatch, PathSegments segments, int segmentIndex) {
-		
+	
 		// If no index was provided, match all nodes with the right name (segment="abc")
 		int requiredIndex = segments.index[segmentIndex];
 		if (requiredIndex < 0)
@@ -1342,7 +1341,7 @@ System.out.println(new String(json, offset, json.length-offset));
 	}
 
 	/**
-	 * Return true if this is the final segment of the selection path.
+	 * Return true if there are more segments in the path after this segment.
 	 * 
 	 * @param segments
 	 * @param segmentIndex

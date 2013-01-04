@@ -76,4 +76,6 @@ public class XD_domXml_Test extends StandardTestCases {
 			}
 		}
 	}
+	
+	// Test DOM specific functions
 }
