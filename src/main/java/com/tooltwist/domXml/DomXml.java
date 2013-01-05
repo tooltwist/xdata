@@ -38,14 +38,37 @@ import com.tooltwist.xdata.XDNotFoundException;
 import com.tooltwist.xdata.XDCallback;
 import com.tooltwist.xdata.XSelector;
 
+/**
+ * This class provides a XSelector implementation for accessing data stored in the
+ * form of the W3C Document Object Model (DOM). It also allows the DOM object to be
+ * manipulated, and the changes propagated throughout the XD form of the data.<p>
+ * 
+ * <pre>
+ * XD data = ...;
+ * DomXml domXml = (DomXml) data.getSelector("xml-dom");
+ * Document document = domXml.getDocument();
+ * // Do stuff with and to the document.
+ * domXml.notifyChanged();
+ * </pre>
+ * 
+ *  <p>
+ *  This class also contains many methods for manipulating and merging data between {@link XD}, {@link Element} and {@link Node} objects.
+ * 
+ * @author philipcallender
+ *
+ */
 public class DomXml implements XSelector, Iterable<XSelector> {
 
 	private Document document;
-//	private PrefixResolverDefault prefixResolver;
-//	private XPathContext rootXpathContext = null;
-//	private int rootContextNode = -1;
 	private XD parentXD;
 
+	// We cache some DOM-related objects, because creating them takes a long time.
+	// These need to be reset to null any time the document is changed.
+	private XPathContext rootXpathContext = null;
+	private PrefixResolverDefault prefixResolver = null;
+	private int rootContextNode = -1;
+
+	
 	public DomXml(XD parent, String xml) throws DomXmlException {
 		this.parentXD = parent;
 		
@@ -133,30 +156,10 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 			InputSource is = new InputSource(reader);
 			document = db.parse(is);
 
-			// Remove the xpath processing structures, so they'll be recreated for the new document
-//			prefixResolver = null;
-//			rootContextNode = -1;
-			
-//	        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();    
-//	        DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("XML 3.0 LS 3.0");
-//	        if (impl == null) {
-//	            System.out.println("No DOMImplementation found !");
-//	            System.exit(0);
-//	        }
-//
-//	        System.out.printf("DOMImplementationLS: %s\n", impl.getClass().getName());
-//
-//	        LSParser parser = impl.createLSParser(
-//	                DOMImplementationLS.MODE_SYNCHRONOUS,
-//	                "http://www.w3.org/TR/REC-xml");
-//	        // http://www.w3.org/2001/XMLSchema
-//	        System.out.printf("LSParser: %s\n", parser.getClass().getName());
-//
-//	        
-//	        impl.createLSInput()DomXml.;
-//	        LSInput input = LSInput;
-//			Document doc = parser.parse(input );
-
+			// Remove the cached xpath processing structures, so they'll be recreated for the new document
+			rootXpathContext = null;
+			prefixResolver = null;
+			rootContextNode = -1;
 			
 		} catch (IOException e) {
 			throw new DomXmlException("Error parsing XML in XData: " + e);
@@ -180,83 +183,47 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	}
 
 	/**
-	 * Return the text value in the first node that matches a specified XPATH below a specified starting point.
-	 * 
-	 * @return The text contained in the first node that matches the specified XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
-	 * @param target
-	 *            The place from which to start the search.
-	 * @see getXpathNodeList
+	 * Cache the prefix resolver for the document. 
 	 */
-//	public PrefixResolver getPrefixResolver() {
-//
-//		//zzzzz
-//		 prefixResolver = null;
-//
-//		// Check the document is up to date (which may remove prefixResolver and parentContextNode)
-//		if (this.prefixResolver == null) {
-//
-////XXXX			getDocument(); // check there is a current document object
-//			prefixResolver = new PrefixResolverDefault(document.getDocumentElement());
-//		}
-//		return prefixResolver;
-//return null;
-//	}
+	private PrefixResolver getPrefixResolverForTheDocument() {
+		// Check the document is up to date (which may remove prefixResolver and parentContextNode)
+		if (this.prefixResolver == null) {
+			prefixResolver = new PrefixResolverDefault(document.getDocumentElement());
+		}
+		return prefixResolver;
+	}
 
 	/**
-	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point.
-	 * 
-	 * @return The text contained in the first node that matches the specified XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
-	 * @param target
-	 *            The place from which to start the search.
-	 * @see getXpathNodeList
+	 * Cache the XPathContext for the root of the document.
 	 */
-//	public int getRootContextNode() {
-////zzzzzzz
-//rootContextNode = -1;
-//
-//		if (rootContextNode >= 0)
-//			return rootContextNode;
-//
-//		// Check we have a DOM document, and an XPathContext for the document
-////		getDocument();
-//		getRootXPathContext();
-//		rootContextNode = rootXpathContext.getDTMHandleFromNode(document.getDocumentElement());
-//		return rootContextNode;
-//	}
+	private XPathContext getRootXPathContext() {
+		if (rootXpathContext != null)
+			return rootXpathContext;
+
+		// Check we have a DOM document, and an XPathContext for the document
+		rootXpathContext = new XPathContext();
+		return rootXpathContext;
+	}
 
 	/**
-	 * Return the text value in the first node that matches a specified XPATH below a specifed starting point.
-	 * 
-	 * @return The text contained in the first node that matches the specified XPath.
-	 * @param xpath
-	 *            An XPath string to be matched.
-	 * @param target
-	 *            The place from which to start the search.
-	 * @see getXpathNodeList
+	 * Cache a context node for the root of the document.
 	 */
-//	public XPathContext getRootXPathContext() {
-//		
-//		//zzzzzz
-//		//rootXpathContext = null;
-//
-//		if (rootXpathContext != null)
-//			return rootXpathContext;
-//
-//		// Check we have a DOM document, and an XPathContext for the document
-//		rootXpathContext = new XPathContext();
-//		return rootXpathContext;
-//	}
+	public int getRootContextNode() {
+		if (rootContextNode >= 0)
+			return rootContextNode;
+
+		// Check we have a DOM document, and an XPathContext for the document
+		XPathContext xPathContext = getRootXPathContext();
+		rootContextNode = xPathContext.getDTMHandleFromNode(document.getDocumentElement());
+		return rootContextNode;
+	}
 
 	/**
 	 * Get a list of nodes that match the specified XPATH.
 	 * 
 	 * @return A list of nodes that match the XPath.
 	 * @param path
-	 *            An selection path string to be matched.
+	 *            A selection path to be matched.
 	 * @see getXpathNode
 	 */
 	public DomXmlList getNodes(String path) throws XDException {
@@ -269,7 +236,7 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * 
 	 * @return A list of nodes that match the selection path.
 	 * @param path
-	 *            A selection path string to be matched.
+	 *            A selection path to be matched.
 	 * @param target
 	 *            A node from which to start matching the path.
 	 * @throws XDException 
@@ -297,28 +264,30 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * Note that W3C XPath indexes start with an index of one (e.g. "/data/country[1]").
 	 * <p>
 	 * @param xpath
-	 *            An XPath string to be matched.
+	 *            An XPath to be matched.
 	 */
 	public NodeList getNodeListWithW3cXpath(String xpath) throws XDException {
 		
 		try {
-			//PrefixResolver prefixResolver = getPrefixResolver();
-			PrefixResolver prefixResolver = new PrefixResolverDefault(document.getDocumentElement());
 			
-			//cccc
-			//XPathContext xpathSupport = getRootXPathContext();
-			XPathContext xpathSupport = new XPathContext();
+			// Step 1 - get the prefix resolver for the document.
+			PrefixResolver prefixResolver = getPrefixResolverForTheDocument();
+			//PrefixResolver prefixResolver = new PrefixResolverDefault(document.getDocumentElement());
+			
+			// Step 2 - xpath context (for the document)
+			XPathContext xpathContext = getRootXPathContext();
+			//XPathContext xpathSupport = new XPathContext();
 
-			//cccc
-			//int contextNode = getRootContextNode();
+			// Step 3 - context node (for the document)
+			int contextNode = getRootContextNode();
 			//getRootXPathContext();
-			int contextNode = xpathSupport.getDTMHandleFromNode(document.getDocumentElement());
+			//int contextNode = xpathSupport.getDTMHandleFromNode(document.getDocumentElement());
 
-
-			// Select the list of nodes
+			// Now select the list of nodes
 			XPath _xpath = new XPath(xpath, null, prefixResolver, XPath.SELECT, null);
-			NodeList nl = _xpath.execute(xpathSupport, contextNode, prefixResolver).nodelist();
+			NodeList nl = _xpath.execute(xpathContext, contextNode, prefixResolver).nodelist();
 			return nl;
+			
 		} catch (TransformerException e) {
 			throw new XDNotFoundException("Error selecting xpath (" + xpath + ") from root: " + e);
 		}
@@ -398,15 +367,15 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 
 	/**
 	 * Get a list of nodes that match the path below a specified starting point.
-	 * @param xpath
-	 *            An XPath string to be matched.
+	 * @param path
+	 *            A selection path to be matched.
 	 * @param target
 	 *            The place from which to start the search.
 	 * @see #select(String)
 	 */
-	public NodeList getNodeList(String selectionPath, Node target) throws XDException {
+	public NodeList getNodeList(String path, Node target) throws XDException {
 		
-		String xpath = convertSelectionPathToXpath(selectionPath);
+		String xpath = convertSelectionPathToXpath(path);
 		return getNodeListWithW3cXpath(xpath, target);
 	}
 
@@ -418,26 +387,28 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * Note that W3C XPath indexes start with an index of one (e.g. "/data/country[1]").
 	 * <p>
 	 * @param xpath
-	 *            An XPath string to be matched.
+	 *            An XPath to be matched.
+	 * @param target
+	 * 		A node within the document held by this DomXml.
 	 */
 	public NodeList getNodeListWithW3cXpath(String xpath, Node target) throws XDException {
 		try {
-			// XPathContext xpathSupport = new XPathContext();
 			
-			//ccccc
-			//XPathContext xpathSupport = getRootXPathContext(); // ZZZZZZZZZ This might be better
-			XPathContext xpathSupport = new XPathContext();
+			// Step 1 - xpath context
+			XPathContext xpathSupport = getRootXPathContext();
 
-
+			// Step 2 - prefix resolver (specific to this target)
 			Node node = (target.getNodeType() == Node.DOCUMENT_NODE) ? ((Document) target).getDocumentElement() : target;
 			PrefixResolverDefault prefixResolver = new PrefixResolverDefault(node);
+			
+			// Step 3 - context node (specific to this target)
 			int contextNode = xpathSupport.getDTMHandleFromNode(target);
 
-			// Select the list of nodes
+			// Now select the list of nodes
 			XPath _xpath = new XPath(xpath, null, prefixResolver, XPath.SELECT, null);
-			// int contextNode = xpathSupport.getDTMHandleFromNode(target);
 			NodeList nl = _xpath.execute(xpathSupport, contextNode, prefixResolver).nodelist();
 			return nl;
+			
 		} catch (TransformerException e) {
 			throw new XDException("Error selecting xpath (" + xpath + ") below specified node: " + e);
 		}
@@ -680,8 +651,22 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 		return s;
 	}
 
+	/**
+	 * Call this method if you change the DOM document returned by {@link #getDocument()}.
+	 *  
+	 * @throws XDException
+	 */
 	public void notifyDocumentChanged() throws XDException {
+		
+		// Remove all selectors from the XData containing this selector, except this selector. This
+		// will cause the string selector or any other to be created, based upon the data contained
+		// in this select (any it's document object).
 		parentXD.invalidateAllSelectorsExcept(this);
+
+		// Remove the cached xpath processing structures, so they'll be recreated for the new document
+		rootXpathContext = null;
+		prefixResolver = null;
+		rootContextNode = -1;
 	}
 
 	public void insert(Node root, String path, XD xd) throws XDException {
@@ -704,16 +689,19 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 		String xpath = convertSelectionPathToXpath(path);
 
 		try {
-			// Select the list of nodes
-			XPathContext xpathSupport = new XPathContext();
-			// XPathContext xpathSupport = hidden.getRootXPathContext(); ZZZZZZZZZ This might be better
+			// Step 1 - path context (for this document)
+			XPathContext xpathContext = getRootXPathContext();
 
+			// Step 2 - prefix resolver (from root, which is probably not the document root)
 			Node node = (root.getNodeType() == Node.DOCUMENT_NODE) ? ((Document) root).getDocumentElement() : root;
 			PrefixResolverDefault prefixResolver = new PrefixResolverDefault(node);
+			
+			// Step 3 - path context (from root, which is probably not the document root)
+			int contextNode = xpathContext.getDTMHandleFromNode(root);
 
+			// Now select the nodes, and return the first if there is one.
 			XPath _xpath = new XPath(xpath, null, prefixResolver, XPath.SELECT, null);
-			int contextNode = xpathSupport.getDTMHandleFromNode(root);
-			NodeList nl = _xpath.execute(xpathSupport, contextNode, prefixResolver).nodelist();
+			NodeList nl = _xpath.execute(xpathContext, contextNode, prefixResolver).nodelist();
 			if (nl.getLength() > 0) {
 				// The xpath exists - return the first node
 				return nl.item(0);
@@ -917,7 +905,7 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * If no suitable node can be found, return null.
 	 * 
 	 * @param path
-	 *            An XPath string to be matched.
+	 *            An selection path to be matched.
 	 * @param index
 	 *            Which node to return.
 	 * @return The index'th node that matches the specified XPath.
@@ -935,7 +923,7 @@ public class DomXml implements XSelector, Iterable<XSelector> {
 	 * that matches the provided path. If no suitable node can be found, return null.
 	 * 
 	 * @param path
-	 *            An XPath string to be matched.
+	 *            A selection path to be matched.
 	 * @param index
 	 *            Which node to return.
 	 * @param target
