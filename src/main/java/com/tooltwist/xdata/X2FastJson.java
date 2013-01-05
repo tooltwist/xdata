@@ -41,8 +41,8 @@ public class X2FastJson extends XSelectorPlugin {
 		try {
 			fastJson = new FastJson(string);
 		} catch (Exception e) {
-			XDException exception = new XDException(e.getMessage());
-			exception.setStackTrace(e.getStackTrace());
+			XDException exception = new XDException(e);
+//			exception.setStackTrace(e.getStackTrace());
 			throw exception;
 		}
 		return fastJson;

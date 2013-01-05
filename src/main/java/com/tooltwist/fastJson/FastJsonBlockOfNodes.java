@@ -4,13 +4,12 @@ import com.tooltwist.fastJson.FastJsonBlockOfNodes;
 
 class FastJsonBlockOfNodes
 {
-	protected static final int SIZE = 1024;
+	protected static final int SIZE = 4096;
 	private FastJsonBlockOfNodes next = null;
 	private int firstNodeNum;
 
 	protected int type[] = new int[SIZE];
 	protected int indent[] = new int[SIZE];
-//	protected String name[] = new String[SIZE];	// Name is left null for comments and special tags
 	protected int line[] = new int[SIZE];
 	protected int nextNodeAtThisLevel[] = new int[SIZE];
 
@@ -18,11 +17,9 @@ class FastJsonBlockOfNodes
 	protected int offsetOfName[] = new int[SIZE];
 	protected int offsetOfValue[] = new int[SIZE];
 	protected int offsetOfValueEnd[] = new int[SIZE];
-//	protected int startTag[] = new int[SIZE];
-//	protected int afterStartTag[] = new int[SIZE];
-//	protected int endTag[] = new int[SIZE];
-//	protected int afterEndTag[] = new int[SIZE];
 
+	
+	
 	FastJsonBlockOfNodes(int firstNodeNum)
 	{
 		this.firstNodeNum = firstNodeNum;

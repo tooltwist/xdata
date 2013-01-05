@@ -415,7 +415,7 @@ System.out.println(new String(json, offset, json.length-offset));
 		lastNodeAtEachIndentLevel[indentLevel] = nodeId;
 
 		// Get the block and index for the new node
-		FastJsonBlockOfNodes block = firstBlock.getBlock(nodeId, false);
+		FastJsonBlockOfNodes block = firstBlock.getBlock(nodeId, true);
 		int indexWithinBlock = nodeId % FastJsonBlockOfNodes.SIZE;
 
 		// Set the details in this node
