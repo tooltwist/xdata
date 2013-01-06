@@ -34,6 +34,10 @@
 
 <p><img src="https://raw.github.com/tooltwist/xdata/master/docs/images/basic-idea-1.jpeg" alt="https://raw.github.com/tooltwist/xdata/master/docs/images/basic-idea-1.jpeg"></p>
 
+<h4>Documentation</h4>
+
+<p><a href="https://github.com/tooltwist/xdata/wiki">XData Wiki</a><br><a href="https://groups.google.com/forum/?fromgroups#!forum/xdata-tooltwist">XData Group</a>  </p>
+
 <h2>Why</h2>
 
 <p>In an application architecture where a website is constructed by assembling components, the source of the data is not known at the time the UI components are written. A UI component may be used in many applications with many data sources, and there's no way of knowing the format of those various data sources at the time the UI component is written. XData allows such components to be developed without consideration for whether data will be provided as XML, JSON, or some other format.</p>
@@ -63,10 +67,6 @@ person/lower_face_information/lengthOfMoustach -&gt; graph/y
 <p>XData also provides <em>fast parsing</em> to give improved performance in cases where the data is large. Typical XML and JSON parsers convert input data from string format into an object representation of the data (e.g. DOM). While this provides flexibility, it can result in a lot of instantiation and garbage collection overhead, creating objects for every element in the document, when typically only part of the data may be required.</p>
 
 <p>XData's <em>fast parsing</em> creates an index over the string representation of the document which is then used to cherry pick specific data values. In some applications, such as accessing large data sets over a Restful interface, this approach can be about ten times faster than common parsers, once garbage collection cost is taken into account. Take a look at the benchmarks section in the wiki for an understanding of where this is appropriate.</p>
-
-<h1>Documentation</h1>
-
-<p>See the <a href="https://github.com/tooltwist/xdata/wiki">XData wiki</a> for more information.</p>
 
 <h2></h2>
       </section>
