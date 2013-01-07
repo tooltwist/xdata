@@ -87,6 +87,7 @@
       </plugin>
 
 <!--
+-->
 	<plugin>
 	    <groupId>org.apache.maven.plugins</groupId>
 	    <artifactId>maven-release-plugin</artifactId>
@@ -95,7 +96,6 @@
 		<mavenExecutorId>forked-path</mavenExecutorId>
 	    </configuration>
 	</plugin>
--->
     </plugins>
   </build>
 
