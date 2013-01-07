@@ -23,19 +23,16 @@
   </scm>
   
   <distributionManagement> 
-
          <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
             <name>nexus snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
          </snapshotRepository>
-
          <repository>
             <id>sonatype-nexus-staging</id>
             <name>nexus releases</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
-
     </distributionManagement>
   
   <developers>
@@ -73,6 +70,20 @@
           <nohelp>true</nohelp>
           -->
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+	<version>1.4</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
