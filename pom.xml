@@ -1,12 +1,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.tooltwist.xdata</groupId>
+  <groupId>com.tooltwist</groupId>
   <artifactId>xdata</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
   <name>xdata</name>
-  <url>http://maven.apache.org</url>
+  <version>0.1-SNAPSHOT</version>
+  <description>Xdata (Cross Data) library for anonymous format and high speed parsing</description>
+  <url>https://github.com/tooltwist/xdata</url>
+  
+    <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:git@github.com:tooltwist/xdata.git</connection>
+    <developerConnection>scm:git:git@github.com:tooltwist/xdata.git</developerConnection>
+    <url>git@github.com:tooltwist/xdata.git</url>
+  </scm>
+  
+  <distributionManagement> 
+  <!--
+         <repository>
+            <id>releases</id>
+            <name>nexus releases</name>
+            <url>http://xxx.xxx.xx.xx:8383/nexus/content/repositories/releases</url>
+        </repository>
+   -->
+
+         <!-- Publish the versioned releases here -->
+         <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>nexus snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+         </snapshotRepository>
+    </distributionManagement>
+  
+  <developers>
+    <developer>
+      <id>philcal</id>
+      <name>Philip Callender</name>
+      <email>philcal@mac.com</email>
+    </developer>
+  </developers>
   
   <dependencies>
     <dependency>
