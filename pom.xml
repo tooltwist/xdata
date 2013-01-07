@@ -4,7 +4,7 @@
   <artifactId>xdata</artifactId>
   <packaging>jar</packaging>
   <name>xdata</name>
-  <version>0.2</version>
+  <version>0.3-SNAPSHOT</version>
   <description>Xdata (Cross Data) library for anonymous format and high speed parsing</description>
   <url>https://github.com/tooltwist/xdata</url>
   
