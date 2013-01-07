@@ -4,7 +4,7 @@
   <artifactId>xdata</artifactId>
   <packaging>jar</packaging>
   <name>xdata</name>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
   <description>Xdata (Cross Data) library for anonymous format and high speed parsing</description>
   <url>https://github.com/tooltwist/xdata</url>
   
@@ -23,19 +23,18 @@
   </scm>
   
   <distributionManagement> 
+         <repository>
+            <id>releases</id>
+            <name>nexus releases</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
 
+         <!-- Publish the versioned releases here -->
          <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
             <name>nexus snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
          </snapshotRepository>
-
-         <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>nexus releases</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-
     </distributionManagement>
   
   <developers>
