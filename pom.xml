@@ -4,7 +4,7 @@
   <artifactId>xdata</artifactId>
   <packaging>jar</packaging>
   <name>xdata</name>
-  <version>0.2.2-SNAPSHOT</version>
+  <version>0.3.1-SNAPSHOT</version>
   <description>Xdata (Cross Data) library for anonymous format and high speed parsing</description>
   <url>https://github.com/tooltwist/xdata</url>
   
@@ -85,6 +85,17 @@
           </execution>
         </executions>
       </plugin>
+
+<!--
+	<plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-release-plugin</artifactId>
+	    <version>2.0</version>
+	    <configuration>
+		<mavenExecutorId>forked-path</mavenExecutorId>
+	    </configuration>
+	</plugin>
+-->
     </plugins>
   </build>
 
