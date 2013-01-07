@@ -23,13 +23,11 @@
   </scm>
   
   <distributionManagement> 
-  <!--
          <repository>
             <id>releases</id>
             <name>nexus releases</name>
-            <url>http://xxx.xxx.xx.xx:8383/nexus/content/repositories/releases</url>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
-   -->
 
          <!-- Publish the versioned releases here -->
          <snapshotRepository>
