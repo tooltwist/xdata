@@ -1,18 +1,19 @@
-## Quick Links
 [Wiki](https://github.com/tooltwist/xdata/wiki)  
 [Group](https://groups.google.com/forum/?fromgroups#!forum/xdata-tooltwist)  
+[Javadoc](http://tooltwist.github.com/xdata/apidocs/index.html) 
 
 ## What is XData?
-XData (aka _Cross Data_) is an "arbitrary data format" library for Java, allowing data to be passed around within a multi-layered Java application without concern for whether it's in XML, JSON, or some other format.
+XData - _Cross Data_ - is an "arbitrary data format" library for Java, allowing data to be passed around within a multi-layered Java application without concern for whether it's in XML, JSON, or some other format.
 
 ![https://raw.github.com/tooltwist/xdata/master/docs/images/basic-idea-1.jpeg](https://raw.github.com/tooltwist/xdata/master/docs/images/basic-idea-1.jpeg)
 
-## Why do I want it?
+## Anonymous Data Formats
 In an application architecture where a website is constructed by assembling components, the source of the data is not known at the time the UI components are written. A UI component may be used in many applications with many data sources, and there's no way of knowing the format of those various data sources at the time the UI component is written. XData allows such components to be developed without consideration for whether data will be provided as XML, JSON, or some other format.
 
 Similarly, the code to access data may not know the format expected by other code that consumes that data.
 
-XData provides a format-neutral mechanism for passing around data, but a consistent API for accessing data. For example, the following XPath-like code can be used to access both XML and JSON data.
+## Consistent API
+XData provides a mechanism for passing around data in unknown formats, but a consistent API for accessing that data. For example, the following XPath-like code can be used to access both XML and JSON data.
 
     XD data = getCountryData();
     for (XD state : data.select("/*/state")) {
