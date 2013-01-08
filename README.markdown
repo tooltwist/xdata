@@ -1,7 +1,7 @@
-[Wiki - Documentation, How-To, Benchmarks](https://github.com/tooltwist/xdata/wiki)  
-[The 2 Minute Tutorial](https://github.com/tooltwist/xdata/wiki/2-minute-tutorial)  
-[Javadoc](http://tooltwist.github.com/xdata/apidocs/index.html)  
-[Group](https://groups.google.com/forum/?fromgroups#!forum/xdata-tooltwist)  
+[Documentation](https://github.com/tooltwist/xdata/wiki) /
+[The 2 Minute Tutorial](https://github.com/tooltwist/xdata/wiki/2-minute-tutorial) /
+[Javadoc](http://tooltwist.github.com/xdata/apidocs/index.html) /
+[Group](https://groups.google.com/forum/?fromgroups#!forum/xdata-tooltwist) /
 [Issues](https://github.com/tooltwist/xdata/issues)  
 
 ## What is XData?
