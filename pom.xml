@@ -8,7 +8,7 @@
   <description>Xdata (Cross Data) library for anonymous format and high speed parsing</description>
   <url>https://github.com/tooltwist/xdata</url>
   
-    <licenses>
+  <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
@@ -16,12 +16,15 @@
     </license>
   </licenses>
   
+  <!-- What source code management tool to use -->
   <scm>
     <connection>scm:git:git@github.com:tooltwist/xdata.git</connection>
     <developerConnection>scm:git:git@github.com:tooltwist/xdata.git</developerConnection>
     <url>git@github.com:tooltwist/xdata.git</url>
   </scm>
   
+  <!-- Where to deploy snapshots and staging -->
+  <!-- The login details are defined in settings.xml -->
   <distributionManagement> 
          <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
@@ -59,6 +62,7 @@
   
   <build>
     <plugins>
+  	<!-- Javadoc plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -71,6 +75,7 @@
           -->
         </configuration>
       </plugin>
+      <!-- Use GPG to sign files -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -85,9 +90,7 @@
           </execution>
         </executions>
       </plugin>
-
-<!--
--->
+      <!-- This plugin prevents the gpg plugin from hanging -->
 	<plugin>
 	    <groupId>org.apache.maven.plugins</groupId>
 	    <artifactId>maven-release-plugin</artifactId>
@@ -96,6 +99,17 @@
 		<mavenExecutorId>forked-path</mavenExecutorId>
 	    </configuration>
 	</plugin>
+      <!-- Send the jars, etc to github, from where they can be downloaded -->
+        <plugin>
+          <groupId>com.github.github</groupId>
+          <artifactId>downloads-maven-plugin</artifactId>
+          <version>0.5</version>
+          <configuration>
+            <description>${project.version} release of ${project.name}</description>
+            <override>true</override>
+            <includeAttached>true</includeAttached>
+          </configuration>
+        </plugin>
     </plugins>
   </build>
 
