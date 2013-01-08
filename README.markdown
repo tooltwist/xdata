@@ -1,6 +1,8 @@
-[Wiki](https://github.com/tooltwist/xdata/wiki)  
+[Wiki - Documentation, How-To, Benchmarks](https://github.com/tooltwist/xdata/wiki)  
+[The 2 Minute Tutorial](https://github.com/tooltwist/xdata/wiki/2-minute-tutorial)  
+[Javadoc](http://tooltwist.github.com/xdata/apidocs/index.html)  
 [Group](https://groups.google.com/forum/?fromgroups#!forum/xdata-tooltwist)  
-[Javadoc](http://tooltwist.github.com/xdata/apidocs/index.html) 
+[Issues](https://github.com/tooltwist/xdata/issues)  
 
 ## What is XData?
 XData - _Cross Data_ - is an "arbitrary data format" library for Java, allowing data to be passed around within a multi-layered Java application without concern for whether it's in XML, JSON, or some other format.
