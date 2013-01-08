@@ -1,0 +1,24 @@
+-classpath
+'/tooltwist/tooltwist_osx_7.0.1-ttDevelopement/devel/xdata/target/classes:/tooltwist/tooltwist_osx_7.0.1-ttDevelopement/devel/xdata/target/test-classes:/Users/philipcallender/.m2/repository/xml-apis/xml-apis/1.3.04/xml-apis-1.3.04.jar:/Users/philipcallender/.m2/repository/xalan/serializer/2.7.1/serializer-2.7.1.jar:/Users/philipcallender/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/philipcallender/.m2/repository/xalan/xalan/2.7.1/xalan-2.7.1.jar:/Users/philipcallender/.m2/repository/junit/junit/4.11/junit-4.11.jar'
+-encoding
+'MacRoman'
+-protected
+-sourcepath
+'/tooltwist/tooltwist_osx_7.0.1-ttDevelopement/devel/xdata/src/test/java'
+-author
+-bottom
+'Copyright &#169; 2013. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/tooltwist/tooltwist_osx_7.0.1-ttDevelopement/devel/xdata/target/site/testapidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'xdata 0.3.2-SNAPSHOT Test API'
+-link
+'http://java.sun.com/javase/6/docs/api'
+-use
+-version
+-windowtitle
+'xdata 0.3.2-SNAPSHOT Test API'

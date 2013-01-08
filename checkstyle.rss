@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>xdata - Checkstyle report</title>
+    <link>https://github.com/tooltwist/xdata</link>
+    <description>xdata - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2013</copyright>
+    <item>
+      <title>File: 26,
+             Errors: 8226,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://github.com/tooltwist/xdata/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/tooltwist/xdata/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XSelectorPlugin.java">com/tooltwist/xdata/XSelectorPlugin.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  142
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.X2FastXml.java">com/tooltwist/xdata/X2FastXml.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  67
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XDIncompatibleFormatException.java">com/tooltwist/xdata/XDIncompatibleFormatException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.domXml.DomXmlSortElement.java">com/tooltwist/domXml/DomXmlSortElement.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  69
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XD.java">com/tooltwist/xdata/XD.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  614
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.domXml.DomXml.java">com/tooltwist/domXml/DomXml.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1625
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.X2FastJson.java">com/tooltwist/xdata/X2FastJson.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  67
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.fastXml.FastXml.java">com/tooltwist/fastXml/FastXml.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1571
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.domXml.DomXmlList.java">com/tooltwist/domXml/DomXmlList.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  240
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XDUnknownConversionException.java">com/tooltwist/xdata/XDUnknownConversionException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XDException.java">com/tooltwist/xdata/XDException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  13
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.X2XmlString.java">com/tooltwist/xdata/X2XmlString.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  82
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XDCallback.java">com/tooltwist/xdata/XDCallback.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  7
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.fastJson.FastJsonBlockOfNodes.java">com/tooltwist/fastJson/FastJsonBlockOfNodes.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  213
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.X2JsonString.java">com/tooltwist/xdata/X2JsonString.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  82
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.fastJson.FastJsonNodes.java">com/tooltwist/fastJson/FastJsonNodes.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  392
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.fastXml.FastXmlBlockOfNodes.java">com/tooltwist/fastXml/FastXmlBlockOfNodes.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  105
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.fastXml.FastXmlException.java">com/tooltwist/fastXml/FastXmlException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.fastJson.FastJsonException.java">com/tooltwist/fastJson/FastJsonException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  11
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XIterator.java">com/tooltwist/xdata/XIterator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  45
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.X2DomXml.java">com/tooltwist/xdata/X2DomXml.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  94
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.domXml.DomXmlException.java">com/tooltwist/domXml/DomXmlException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  11
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XDNotFoundException.java">com/tooltwist/xdata/XDNotFoundException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.fastJson.FastJson.java">com/tooltwist/fastJson/FastJson.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2159
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.fastXml.FastXmlNodes.java">com/tooltwist/fastXml/FastXmlNodes.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  373
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/tooltwist/xdata/checkstyle.html#com.tooltwist.xdata.XSelector.java">com/tooltwist/xdata/XSelector.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  212
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+
