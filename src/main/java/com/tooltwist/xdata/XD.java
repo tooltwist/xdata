@@ -1,5 +1,7 @@
 package com.tooltwist.xdata;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
@@ -167,8 +169,18 @@ public class XD implements XSelector {
 	}
 
 	public XD(InputStream is) throws XDException {
-		// TODO Auto-generated constructor stub
-		//ZZZZZZZZZZZZZZ
+		try {
+			String data = loadStringFromReader(is);
+			checkDefaultsLoaded();
+			init();
+			
+			if (data.trim().equals(""))
+				data = "<empty/>";
+	
+			setString(data);
+		} catch (IOException e) {
+			throw new XDException(e);
+		}
 	}
 
 	/**
@@ -454,4 +466,67 @@ public class XD implements XSelector {
 	public Iterable<XSelector> foreach(String xpath) throws XDException {
 		return this.getSelector().foreach(xpath);
 	}
+	
+	
+	//-----------------------------------------------------------------------------------------------------
+	//	Stuff that should probably be elsewhere.
+	public static final byte BOM_UTF16_1 = (byte) 0xFF;
+	public static final byte BOM_UTF16_2 = (byte) 0xFE;
+	public static final byte BOM_UTF8_1 = (byte) 0xEF;
+	public static final byte BOM_UTF8_2 = (byte) 0xBB;
+	public static final byte BOM_UTF8_3 = (byte) 0xBF;
+
+
+	/**
+	 * Read an input stream and return it as a string, checking for Unicode conversion if required.
+	 * 
+	 * @param inputStream
+	 * @return File contents as a String.
+	 * @throws IOException
+	 */
+	public static String loadStringFromReader(InputStream inputStream) throws IOException {
+		
+		// Read the file contents from a Reader object into a buffer.
+		ByteArrayOutputStream writer = new ByteArrayOutputStream();
+		byte[] buf = new byte[4 * 4096];
+		String encoding = "UTF-8"; // Ascii can be loaded as UTF-8
+		for (boolean startOfFile = true;; startOfFile = false) {
+			int len = inputStream.read(buf);
+			if (len < 0)
+				break;
+
+			// Check for byte markers that specify the encoding
+			if (startOfFile) {
+				if (len >= 2 && buf[0] == BOM_UTF16_1 && buf[1] == BOM_UTF16_2) {
+					
+					// UTF-16 - The BOM bytes are automatically stripped off during the conversion.
+					encoding = "UTF-16";
+					writer.write(buf, 0, len);
+					continue;
+				} else if (len >= 2 && buf[0] == BOM_UTF16_2 && buf[1] == BOM_UTF16_1) {
+					
+					// UTF-16 - The BOM bytes are automatically stripped off during the conversion.
+					encoding = "UTF-16";
+					writer.write(buf, 0, len);
+					continue;
+				} else if (len >= 3 && buf[0] == BOM_UTF8_1 && buf[1] == BOM_UTF8_2 && buf[2] == BOM_UTF8_3) {
+					
+					// UTF-8 - Strip off the BOM. For some reason java.io.String doesn't do this for UTF-8.
+					encoding = "UTF-8";
+					writer.write(buf, 3, len - 3);
+					continue;
+				}
+			}
+				
+			// Not Unicode - Add the bytes to the buffer
+			writer.write(buf, 0, len);
+		}
+		inputStream.close();
+
+		// Convert the byte array to a string, using the appropriate encoding.
+		byte[] array = writer.toByteArray();
+		String contents = (encoding == null) ? new String(array) : new String(array, encoding);
+		return contents;
+	}
+
 }
