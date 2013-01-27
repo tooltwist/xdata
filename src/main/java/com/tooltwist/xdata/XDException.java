@@ -9,6 +9,7 @@ public class XDException extends Exception {
 
 	public XDException(Exception e) {
 		super(e);
+		this.setStackTrace(e.getStackTrace());
 	}
 
 }

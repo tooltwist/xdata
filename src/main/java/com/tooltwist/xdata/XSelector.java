@@ -87,7 +87,41 @@ public interface XSelector {
 	 * @throws XDataNotFoundException
 	 */
 	public String getString(String xpath) throws XDException;
+	
+	/**
+	 * Get a field value as a String.
+	 * 
+	 * If the value is null, return defaultValue. 
+	 * 
+	 * @param xpath
+	 * @return
+	 * @throws XDataException
+	 * @throws XDataNotFoundException
+	 */
+	public String getString(String xpath, String defaultValue) throws XDException;
 
+
+	/**
+	 * Get a field value containing an integer.
+	 *
+	 * @param xpath
+	 * @return
+	 * @throws XDException
+	 * If the field does not contain a valid integer.
+	 */
+	public int getInteger(String xpath) throws XDNumberFormatException, XDException;
+
+	/**
+	 * Get a field value containing an integer.
+	 * 
+	 * If the field's value is null, return defaultValue. 
+	 *
+	 * @param xpath
+	 * @return
+	 * @throws XDException
+	 * If the field does not contain a valid integer.
+	 */
+	int getInteger(String xpath, int defaultValue) throws XDNumberFormatException, XDException;
 
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods for selecting a list from within the current element.

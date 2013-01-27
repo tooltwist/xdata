@@ -170,7 +170,7 @@ public class XD implements XSelector {
 
 	public XD(InputStream is) throws XDException {
 		try {
-			String data = loadStringFromReader(is);
+			String data = readFromStream(is);
 			checkDefaultsLoaded();
 			init();
 			
@@ -448,6 +448,21 @@ public class XD implements XSelector {
 	}
 
 	@Override
+	public String getString(String xpath, String defaultValue) throws XDException {
+		return this.getSelector().getString(xpath, defaultValue);
+	}
+
+	@Override
+	public int getInteger(String xpath) throws XDNumberFormatException, XDException {
+		return this.getSelector().getInteger(xpath);
+	}
+
+	@Override
+	public int getInteger(String xpath, int defaultValue) throws XDNumberFormatException, XDException {
+		return this.getSelector().getInteger(xpath, defaultValue);
+	}
+
+	@Override
 	public XSelector select(String xpath) throws XDException {
 		return this.getSelector().select(xpath);
 	}
@@ -484,7 +499,7 @@ public class XD implements XSelector {
 	 * @return File contents as a String.
 	 * @throws IOException
 	 */
-	public static String loadStringFromReader(InputStream inputStream) throws IOException {
+	public static String readFromStream(InputStream inputStream) throws IOException {
 		
 		// Read the file contents from a Reader object into a buffer.
 		ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -527,6 +542,15 @@ public class XD implements XSelector {
 		byte[] array = writer.toByteArray();
 		String contents = (encoding == null) ? new String(array) : new String(array, encoding);
 		return contents;
+	}
+
+	public String toString() {
+		try {
+			String xml = this.getString();
+			return "XD:\n" + xml;
+		} catch (XDException e) {
+			return "Exception getting XML: " + e.getMessage();
+		}
 	}
 
 }

@@ -6,6 +6,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.tooltwist.xdata.XDException;
+import com.tooltwist.xdata.XDNumberFormatException;
 import com.tooltwist.xdata.XIterator;
 import com.tooltwist.xdata.XDCallback;
 import com.tooltwist.xdata.XSelector;
@@ -36,6 +37,38 @@ public class DomXmlList implements XSelector, Iterable<XSelector> {
 		if (xpath == null || xpath.equals(""))
 			return "";
 		return xmlData.getText(xpath, current);
+	}
+
+	@Override
+	public String getString(String xpath, String defaultValue) throws XDException {
+		String string = getString(xpath);
+		if (string.equals(""))
+			return defaultValue;
+		return string;
+	}
+
+	@Override
+	public int getInteger(String xpath) throws XDNumberFormatException, XDException {
+		String string = getString(xpath).trim();
+		try {
+			int val = Integer.parseInt(string);
+			return val;
+		} catch (NumberFormatException e) {
+			throw new XDNumberFormatException("Expected an Integer (" + string + ")");
+		}
+	}
+
+	@Override
+	public int getInteger(String xpath, int defaultValue) throws XDNumberFormatException, XDException {
+		String string = getString(xpath).trim();
+		if (string.equals(""))
+			return defaultValue;
+		try {
+			int val = Integer.parseInt(string);
+			return val;
+		} catch (NumberFormatException e) {
+			throw new XDNumberFormatException("Expected an Integer (" + string + ")");
+		}
 	}
 
 

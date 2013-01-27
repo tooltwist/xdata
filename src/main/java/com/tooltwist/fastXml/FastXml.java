@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.tooltwist.xdata.XDException;
+import com.tooltwist.xdata.XDNumberFormatException;
 import com.tooltwist.xdata.XIterator;
 import com.tooltwist.xdata.XDCallback;
 import com.tooltwist.xdata.XSelector;
@@ -1047,6 +1048,38 @@ public class FastXml implements XSelector, Iterable<XSelector> {
 			XDException exception = new XDException(e.getMessage());
 			exception.setStackTrace(e.getStackTrace());
 			throw exception;
+		}
+	}
+
+	@Override
+	public String getString(String xpath, String defaultValue) throws XDException {
+		String string = getString(xpath);
+		if (string.trim().equals(""))
+			return defaultValue;
+		return string;
+	}
+
+	@Override
+	public int getInteger(String xpath) throws XDNumberFormatException, XDException {
+		String string = getString(xpath).trim();
+		try {
+			int val = Integer.parseInt(string);
+			return val;
+		} catch (NumberFormatException e) {
+			throw new XDNumberFormatException("Expected an Integer (" + string + ")");
+		}
+	}
+
+	@Override
+	public int getInteger(String xpath, int defaultValue) throws XDNumberFormatException, XDException {
+		String string = getString(xpath).trim();
+		if (string.equals(""))
+			return defaultValue;
+		try {
+			int val = Integer.parseInt(string);
+			return val;
+		} catch (NumberFormatException e) {
+			throw new XDNumberFormatException("Expected an Integer (" + string + ")");
 		}
 	}
 
