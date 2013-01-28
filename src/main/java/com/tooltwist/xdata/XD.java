@@ -423,7 +423,8 @@ public class XD implements XSelector {
 	@Override
 	public String currentName() {
 		try {
-			return this.getSelector().currentName();
+			XSelector selector = this.getSelector();
+			return selector.currentName();
 		} catch (XDException e) {
 			// Should not be possible.
 			// Just in case, we'll throw an exception, even though this method doesn't declare a thrown exception.
@@ -439,47 +440,68 @@ public class XD implements XSelector {
 
 	@Override
 	public boolean setCurrentIndex(int index) throws XDException {
-		return this.getSelector().setCurrentIndex(index);
+		XSelector selector = this.getSelector();
+		return selector.setCurrentIndex(index);
 	}
 
 	@Override
 	public String getString(String xpath) throws XDException {
-		return this.getSelector().getString(xpath);
+		XSelector selector = this.getSelector();
+		return selector.getString(xpath);
 	}
 
 	@Override
 	public String getString(String xpath, String defaultValue) throws XDException {
-		return this.getSelector().getString(xpath, defaultValue);
+		XSelector selector = this.getSelector();
+		return selector.getString(xpath, defaultValue);
 	}
 
 	@Override
 	public int getInteger(String xpath) throws XDNumberFormatException, XDException {
-		return this.getSelector().getInteger(xpath);
+		XSelector selector = this.getSelector();
+		return selector.getInteger(xpath);
 	}
 
 	@Override
 	public int getInteger(String xpath, int defaultValue) throws XDNumberFormatException, XDException {
-		return this.getSelector().getInteger(xpath, defaultValue);
+		XSelector selector = this.getSelector();
+		return selector.getInteger(xpath);
+	}
+
+	@Override
+	public boolean getBoolean(String xpath) throws XDException {
+		XSelector selector = this.getSelector();
+		return selector.getBoolean(xpath);
+	}
+
+	@Override
+	public boolean getBoolean(String xpath, boolean defaultValue) throws XDException {
+		XSelector selector = this.getSelector();
+		return selector.getBoolean(xpath, defaultValue);
 	}
 
 	@Override
 	public XSelector select(String xpath) throws XDException {
-		return this.getSelector().select(xpath);
+		XSelector selector = this.getSelector();
+		return selector.select(xpath);
 	}
 
 	@Override
 	public void foreach(String xpath, Object userData, XDCallback callback) throws XDException {
-		this.getSelector().foreach(xpath, userData, callback);
+		XSelector selector = this.getSelector();
+		selector.foreach(xpath, userData, callback);
 	}
 
 	@Override
 	public void foreach(String xpath, XDCallback callback) throws XDException {
-		this.getSelector().foreach(xpath, callback);
+		XSelector selector = this.getSelector();
+		selector.foreach(xpath, callback);
 	}
 
 	@Override
 	public Iterable<XSelector> foreach(String xpath) throws XDException {
-		return this.getSelector().foreach(xpath);
+		XSelector selector = this.getSelector();
+		return selector.foreach(xpath);
 	}
 	
 	
@@ -551,6 +573,92 @@ public class XD implements XSelector {
 		} catch (XDException e) {
 			return "Exception getting XML: " + e.getMessage();
 		}
+	}
+
+	/**
+	 * Note: it's more convenient to use {@link XSelector#getInteger(String))}.
+	 * 
+	 * @param selector
+	 * @param xpath
+	 * @return
+	 * @throws XDException
+	 */
+	public static int getInteger(XSelector selector, String xpath) throws XDException {
+		String string = selector.getString(xpath).trim();
+		try {
+			int val = Integer.parseInt(string);
+			return val;
+		} catch (NumberFormatException e) {
+			throw new XDNumberFormatException("Expected an Integer (" + string + ")");
+		}
+	}
+
+	/**
+	 * Note: it's more convenient to use {@link XSelector#getInteger(String, int)}.
+	 * 
+	 * @param selector
+	 * @param xpath
+	 * @return
+	 * @throws XDException
+	 */
+	public static int getInteger(XSelector selector, String xpath, int defaultValue) throws XDException {
+		String string = selector.getString(xpath).trim();
+		if (string.equals(""))
+			return defaultValue;
+		try {
+			int val = Integer.parseInt(string);
+			return val;
+		} catch (NumberFormatException e) {
+			throw new XDNumberFormatException("Expected an Integer (" + string + ")");
+		}
+	}
+
+	/**
+	 * Note: it's more convenient to use {@link XSelector#getBoolean(String)}.
+	 * 
+	 * @param selector
+	 * @param xpath
+	 * @return
+	 * @throws XDException
+	 */
+	public static boolean getBoolean(XSelector selector, String xpath) throws XDException {
+		String string = selector.getString(xpath);
+		if (string.equals(""))
+			return false;
+		char c = string.trim().charAt(0);
+		
+		// check for true
+		if (c=='1' || c=='t' || c=='T' || c=='y' || c=='Y')
+			return true;
+		
+		// Not true default to false
+		return false;
+	}
+
+	/**
+	 * Note: it's more convenient to use {@link XSelector#getBoolean(String, boolean)}.
+	 * 
+	 * @param selector
+	 * @param xpath
+	 * @return
+	 * @throws XDException
+	 */
+	public static boolean getBoolean(XSelector selector, String xpath, boolean defaultValue) throws XDException {
+		String string = selector.getString(xpath);
+		if (string.equals(""))
+			return defaultValue;
+		char c = string.trim().charAt(0);
+
+		// Check for true
+		if (c=='1' || c=='t' || c=='T' || c=='y' || c=='Y')
+			return true;
+
+		// check for false
+		if (c=='0' || c=='f' || c=='F' || c=='n' || c=='N')
+			return false;
+		
+		// Return the default
+		return defaultValue;
 	}
 
 }

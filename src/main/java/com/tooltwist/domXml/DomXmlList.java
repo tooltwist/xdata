@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.tooltwist.xdata.XD;
 import com.tooltwist.xdata.XDException;
 import com.tooltwist.xdata.XDNumberFormatException;
 import com.tooltwist.xdata.XIterator;
@@ -49,26 +50,22 @@ public class DomXmlList implements XSelector, Iterable<XSelector> {
 
 	@Override
 	public int getInteger(String xpath) throws XDNumberFormatException, XDException {
-		String string = getString(xpath).trim();
-		try {
-			int val = Integer.parseInt(string);
-			return val;
-		} catch (NumberFormatException e) {
-			throw new XDNumberFormatException("Expected an Integer (" + string + ")");
-		}
+		return XD.getInteger(this, xpath);
 	}
 
 	@Override
 	public int getInteger(String xpath, int defaultValue) throws XDNumberFormatException, XDException {
-		String string = getString(xpath).trim();
-		if (string.equals(""))
-			return defaultValue;
-		try {
-			int val = Integer.parseInt(string);
-			return val;
-		} catch (NumberFormatException e) {
-			throw new XDNumberFormatException("Expected an Integer (" + string + ")");
-		}
+		return XD.getInteger(this, xpath, defaultValue);
+	}
+
+	@Override
+	public boolean getBoolean(String xpath) throws XDException {
+		return XD.getBoolean(this, xpath);
+	}
+
+	@Override
+	public boolean getBoolean(String xpath, boolean defaultValue) throws XDException {
+		return XD.getBoolean(this, xpath, defaultValue);
 	}
 
 

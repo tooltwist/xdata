@@ -123,6 +123,40 @@ public interface XSelector {
 	 */
 	int getInteger(String xpath, int defaultValue) throws XDNumberFormatException, XDException;
 
+	/**
+	 * Get a field value containing a boolean value.
+	 * <br>
+	 * The first character of the value is checked, case insensitively:<br>
+	 * <ul>
+	 * <li>true if  '1', 't', or 'y' (1, true, yes).</li>
+	 * </ul>
+	 * 
+	 * Any other value is returned as false. 
+	 *
+	 * @param xpath
+	 * @return
+	 * @throws XDException 
+	 */
+	public boolean getBoolean(String xpath) throws XDException;
+
+	/**
+	 * Get a field value containing a boolean value.
+	 * <br>
+	 * The first character of the value is checked, case insensitively:<br>
+	 * <ul>
+	 * <li>false if  '0', 'f', or 'n' (0, false, no).</li>
+	 * <li>true if  '1', 't', or 'y' (1, true, yes).</li>
+	 * </ul>
+	 * 
+	 * If the field's value is null, return defaultValue. 
+	 *
+	 * @param xpath
+	 * @return
+	 * @throws XDException 
+	 */
+	public boolean getBoolean(String xpath, boolean defaultValue) throws XDException;
+	
+	
 	//--------------------------------------------------------------------------------------------------------------------
 	// Methods for selecting a list from within the current element.
 
