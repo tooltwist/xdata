@@ -2,7 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tooltwist</groupId>
   <artifactId>xdata</artifactId>
-  <packaging>jar</packaging>
   <name>xdata</name>
   <version>0.3.2-SNAPSHOT</version>
   <description>Xdata (Cross Data) library for anonymous format and high speed parsing</description>
@@ -103,7 +102,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-	<version>1.4</version>
+		<version>1.4</version>
+		<configuration>
+			<skip>true</skip>
+		</configuration>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -120,7 +122,7 @@
 	    <artifactId>maven-release-plugin</artifactId>
 	    <version>2.0</version>
 	    <configuration>
-		<mavenExecutorId>forked-path</mavenExecutorId>
+			<mavenExecutorId>forked-path</mavenExecutorId>
 	    </configuration>
 	</plugin>
       <!-- Send the javadoc, etc to Github Pages -->

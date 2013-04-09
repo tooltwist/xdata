@@ -12,7 +12,6 @@ import com.tooltwist.fastJson.FastJson;
 import com.tooltwist.fastJson.FastJsonNodes;
 import com.tooltwist.xdata.XD;
 import com.tooltwist.xdata.XDException;
-import com.tooltwist.xdata.XSelector;
 
 
 public class XD_fastJson_Test extends StandardTestCases {
