@@ -82,7 +82,8 @@ public class FastJsonTest {
 		try {
 
 			String json = "{"
-					+ "\"array\" : [ \"val1\", \"val\", \"val3\" ] "
+					+ "\"array\" : [ \"val1\", \"val\", \"val3\" ], "
+					+ "\"emptyArray\" : [ ] "
 					+ "}";
 			new FastJson(json);
 

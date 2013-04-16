@@ -267,6 +267,16 @@ System.out.println(new String(json, offset, json.length-offset));
 			syntax("Internal error 82602");
 		}
 */
+		
+		// Check for an empty array
+		skipSpaces();
+		if (json[offsetWhileParsing] == ']') {
+			// End of the array
+//System.out.println("End of Array");
+			offsetWhileParsing++;
+			return;
+		}
+
 
 		// Parse the contents of the array.
 		for ( ; ; ) {
