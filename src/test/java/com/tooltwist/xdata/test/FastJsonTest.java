@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.tooltwist.fastJson.FastJson;
+import com.tooltwist.xdata.XSelector;
 
 
 public class FastJsonTest {
@@ -83,10 +84,21 @@ public class FastJsonTest {
 
 			String json = "{"
 					+ "\"array\" : [ \"val1\", \"val\", \"val3\" ], "
-					+ "\"emptyArray\" : [ ] "
+					+ "\"emptyArray\" : [ ] , "
+					+ "\"emptyArrayAtEnd\" : [ ]"
 					+ "}";
-			new FastJson(json);
+			FastJson obj = new FastJson(json);
+			//obj.debugDump();
 
+			XSelector items = obj.select("array");
+			assertEquals("size() returned wrong size for array.", 3, items.size()); 
+			
+			items = obj.select("emptyArray");
+			assertEquals("size() returned wrong size for empty array.", 0, items.size()); 
+			
+			items = obj.select("emptyArrayAtEnd");
+			assertEquals("size() returned wrong size for empty array at end.", 0, items.size()); 
+			
 		} catch (Exception e) {
 			fail(e.toString());
 		}

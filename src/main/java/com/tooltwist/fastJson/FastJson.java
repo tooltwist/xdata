@@ -50,6 +50,8 @@ public class FastJson implements XSelector, Iterable<XSelector> {
 	
 	// Blocks of nodes
 	private FastJsonBlockOfNodes firstBlock = new FastJsonBlockOfNodes(0);
+	
+	// Total number of nodes within these blocks. Note that each block fills, before using the next.
 	private int	numNodes = 0;
 	
 	// Values used while parsing
@@ -66,6 +68,19 @@ public class FastJson implements XSelector, Iterable<XSelector> {
 	protected class PathSegments {
 		String[] name;
 		int[] index;
+		
+		public String toString() {
+			String s = "[ ";
+			String sep = "";
+			for (int i = 0; i < name.length; i++) {
+				s += sep + name[i];
+				if (index[i] >= 0)
+					s += "[" + index[i] + "]";
+				sep = ", ";
+			}
+			s += " ]";
+			return s;
+		}
 	};
 
 	public FastJson(String json) throws FastJsonException
@@ -1166,6 +1181,9 @@ System.out.println(new String(json, offset, json.length-offset));
 			int offsetOfName = block.offsetOfName[index];
 			if (indent != requiredIndent)
 				return totalMatches;
+
+			// Find the next node at the same level as this node (stop when we reach it)
+			int nextChildAtThisLevelNodeNum = block.nextNodeAtThisLevel[index]; 
 			
 			// See if the name matches the part of the XPATH at this level
 //String name = new String(json, offsetOfName, 5);
@@ -1179,6 +1197,10 @@ System.out.println(new String(json, offset, json.length-offset));
 					// if it was this node (i.e. it matches the required name).
 					// The first element will be the node directly after the array node.
 					int elementNodeNum = childNodeNum + 1;
+					if (elementNodeNum >= numNodes || elementNodeNum >= nextChildAtThisLevelNodeNum) {
+						// There are no nodes within this child.
+						return 0;
+					}
 					for ( ; ; ) {
 						cntNameMatch++;
 
