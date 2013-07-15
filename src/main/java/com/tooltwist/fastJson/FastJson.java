@@ -1197,7 +1197,11 @@ System.out.println(new String(json, offset, json.length-offset));
 					// if it was this node (i.e. it matches the required name).
 					// The first element will be the node directly after the array node.
 					int elementNodeNum = childNodeNum + 1;
-					if (elementNodeNum >= numNodes || elementNodeNum >= nextChildAtThisLevelNodeNum) {
+					if (
+							elementNodeNum >= numNodes // After entire JSON document
+							||
+							(nextChildAtThisLevelNodeNum >= 0 && elementNodeNum >= nextChildAtThisLevelNodeNum) // Run out of nodes beneath the child. 
+					) {
 						// There are no nodes within this child.
 						return 0;
 					}

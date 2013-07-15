@@ -105,6 +105,22 @@ public class FastJsonTest {
 	}
 
 	@Test
+	public void basic_array() {
+		try {
+
+			String json = "{\"cartId\":\"b52941181e18b7ef1e5dc2c4c3909808a78d6c69\",\"items\":[{\"productId\":\"1\"}]}";
+			FastJson obj = new FastJson(json);
+			obj.debugDump();
+
+			XSelector items = obj.select("items");
+			assertEquals("size() returned wrong size for array.", 1, items.size()); 
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+
+	@Test
 	public void top_level_array() {
 		try {
 
