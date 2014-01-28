@@ -2,3 +2,7 @@ bin/
 oldSrc/
 .DS_Store
 target/
+reports/
+/build/
+/.gradle/
+.classpath
