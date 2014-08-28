@@ -2,9 +2,6 @@ environment:
 
   image: tooltwist/blank
 
-environment:
-
-  language: java
 
 build:
   info:
