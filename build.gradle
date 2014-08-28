@@ -1,30 +1,135 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
-
-sourceCompatibility = 1.7
-group = 'com.tooltwist'
-version = '8.3-SNAPSHOT'
-
-repositories {
-	ivy {
-//		url "file://Users/philipcallender/Development/gradle_repository"
-		url "file:/${localRepo}"
-		layout "maven"
-	}
-//	mavenLocal()
-    mavenCentral()
-}
+apply plugin: 'artifactory'
+apply plugin: 'maven' // so a POM file can be uploaded to repo
 
 dependencies {
     compile group: 'xalan', name: 'xalan', version: '2.7.1'
     testCompile group: 'junit', name: 'junit', version: '4.8.2'
 }
 
-uploadArchives {
+
+/**************************************************************************************************
+ *
+ *	NOTE: Standard code from here on down.
+ *
+ *	Values defined in ../gradle.properties:
+ *		PROJECT_GROUP, PROJECT_SOURCE_COMPATIBILITY, PROJECT_VERSION, PROJECT_REPO
+ *
+ *	Values defined in ~/.gradle/gradle.properties:
+ *		artifactory_user, artifactory_password, artifactory_repo
+ */
+group = PROJECT_GROUP
+version = PROJECT_VERSION
+sourceCompatibility = PROJECT_SOURCE_COMPATIBILITY
+
+// Remember whether this is a snapshot or release, so we publish to the correct repository.
+project.ext.isSnapshot = version.endsWith("-SNAPSHOT")
+
+// Include jars for the artifactory plugin
+buildscript {
     repositories {
-	ivy {
-		url "file:/${localRepo}"
-		layout "maven"
+        maven {
+            url TOOLTWIST_ARTIFACTORY_CONTEXTURL + TOOLTWIST_ARTIFACTORY_REPO
+            credentials {
+                username = "${TOOLTWIST_ARTIFACTORY_USER}"
+                password = "${TOOLTWIST_ARTIFACTORY_PASSWORD}"
+            }
 	}
+	mavenCentral()
+    }
+    dependencies {
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.0.9')
     }
 }
+
+configurations {
+        published
+}
+
+artifactory {
+    publish {
+        repository {
+	    contextUrl = "${TOOLTWIST_PUBLISH_ARTIFACTORY_CONTEXTURL}"
+	    repoKey = isSnapshot ? "${TOOLTWIST_PUBLISH_SNAPSHOT_REPO}" : "${TOOLTWIST_PUBLISH_RELEASE_REPO}"
+            username = "${TOOLTWIST_PUBLISH_ARTIFACTORY_USER}"
+            password = "${TOOLTWIST_PUBLISH_ARTIFACTORY_PASSWORD}"
+            maven = true
+	    ivy { 
+	      ivyLayout = '[organization]/[module]/ivy-[revision].xml' 
+	      artifactLayout = '[organization]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]' 
+	      mavenCompatible = true
+	    } 
+        }
+	defaults {
+	    publishConfigs('archives', 'published')
+	    properties = ['build.status': "$it.project.status".toString()]
+	}
+    }
+    resolve {
+        repository {
+	    contextUrl = "${TOOLTWIST_ARTIFACTORY_CONTEXTURL}"
+            repoKey = "${TOOLTWIST_ARTIFACTORY_REPO}"
+            username = "${TOOLTWIST_ARTIFACTORY_USER}"
+            password = "${TOOLTWIST_ARTIFACTORY_PASSWORD}"
+            maven = true
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.12'
+}
+
+/**************************************************************************************************
+ *
+ *	Copy various resources into the jar file or into separate zip files.
+ */
+task copyConfig(type: Copy) {
+	from('config')
+	into 'build/classes/main/META-INF/tooltwist/config'
+}
+task copyWidgets(type: Copy) {
+	from('widgets')
+	into 'build/classes/main/META-INF/tooltwist/widgets'
+}
+task copyWebContent(type: Copy) {
+	from('WebContent')
+	into 'build/classes/main/META-INF/resources'
+}
+task configZip(type: Zip) {
+	from 'config'
+	classifier = "tooltwist-config"
+}
+task widgetsZip(type: Zip) {
+	from 'widgets'
+	classifier = "tooltwist-widgets"
+}
+task webcontentZip(type: Zip) {
+	from 'WebContent'
+	classifier = "tooltwist-webcontent"
+}
+processResources {
+	// Maybe place resources directly inside the jar file.
+	if (project.hasProperty('PROJECT_DIRECTORIES_IN_JAR') && PROJECT_DIRECTORIES_IN_JAR.toBoolean()) {
+		println "Including config, widgets and WebContent inside jar file"
+		processResources.dependsOn("copyWebContent")
+		processResources.dependsOn("copyConfig")
+		processResources.dependsOn("copyWidgets")
+	}
+
+	// Create zip files for config, widget and WebContent.
+	if (file('config').isDirectory()) {
+	    processResources.dependsOn("configZip")
+	    project.artifacts { archives configZip }
+	}
+	if (file('widgets').isDirectory()) {
+	    processResources.dependsOn("widgetsZip")
+	    project.artifacts { archives widgetsZip }
+	}
+	if (file('WebContent').isDirectory()) {
+	    processResources.dependsOn("webcontentZip")
+	    project.artifacts { archives webcontentZip }
+	}
+}
+
