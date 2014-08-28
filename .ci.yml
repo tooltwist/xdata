@@ -1,6 +1,18 @@
 environment:
 
+  image: tooltwist/blank
+
+environment:
+
   language: java
+  language_versions: 1.7
+
+build:
+  info:
+    - echo THIS IS NICE
+    - echo "Env:" ; env
+    - java -version
+  run:  gradlew build 
 
 
 
