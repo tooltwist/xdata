@@ -193,7 +193,7 @@ System.out.println(new String(json, offset, json.length-offset));
 		if (json[offsetWhileParsing] == '}') {
 			// End of the object
 			offsetWhileParsing++;
-System.out.println("Empty Object.");
+//System.out.println("Empty Object.");
 			return;
 		}
 		
