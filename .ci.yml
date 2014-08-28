@@ -5,7 +5,6 @@ environment:
 environment:
 
   language: java
-  language_versions: 1.7
 
 build:
   info:
