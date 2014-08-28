@@ -2,12 +2,14 @@ environment:
 
   image: tooltwist/blank
 
+  language: java
 
 build:
   info:
     - echo THIS IS NICE
     - echo "Env:" ; env
     - java -version
+
   run:  gradlew build 
 
 
