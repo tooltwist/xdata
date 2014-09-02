@@ -29,14 +29,7 @@ project.ext.isSnapshot = version.endsWith("-SNAPSHOT")
 // Include jars for the artifactory plugin
 buildscript {
     repositories {
-        maven {
-            url TOOLTWIST_ARTIFACTORY_CONTEXTURL + TOOLTWIST_ARTIFACTORY_REPO
-            credentials {
-                username = "${TOOLTWIST_ARTIFACTORY_USER}"
-                password = "${TOOLTWIST_ARTIFACTORY_PASSWORD}"
-            }
-	}
-	mavenCentral()
+	maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
     }
     dependencies {
         classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.0.9')
