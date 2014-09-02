@@ -1,6 +1,6 @@
 test:
   override:
-    - gradlew test artifactoryPublish
+    - ./gradlew test artifactoryPublish
 
 general:
   artifacts:
