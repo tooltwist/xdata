@@ -1,0 +1,8 @@
+test:
+  override:
+    - gradlew test artifactoryPublish
+
+general:
+  artifacts:
+    - "build/reports/tests" # relative to the build directory
+
