@@ -69,7 +69,17 @@ artifactory {
         }
     }
 }
+ 
+// Note that tests only get run when the code changes
+test {
+    testLogging {
+        // Show that tests are run in the command-line output
+	events "passed", "skipped", "failed"
+    }
+}
 
+// The Gradle wrapper allows building without Gradle installed
+// See http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 task wrapper(type: Wrapper) {
   gradleVersion = '1.12'
 }
