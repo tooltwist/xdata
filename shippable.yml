@@ -1,0 +1,15 @@
+language: java
+
+jdk:
+   - openjdk7
+#   - oraclejdk7
+#   - openjdk6
+#   - oraclejdk8
+
+after_success:
+   - gradle artifactoryPublish
+
+notifications:
+  email:
+      recipients:
+         - philcal@mac.com
