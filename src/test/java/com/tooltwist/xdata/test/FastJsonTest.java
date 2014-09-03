@@ -44,7 +44,6 @@ public class FastJsonTest {
 
 	@Test
 	public void strings_and_literals() {
-fail("I dont like Mondays");
 		try {
 			
 			String json = "{"
