@@ -80,7 +80,6 @@ public class FastJsonTest {
 
 	@Test
 	public void nested_array() {
-fail("Failing for Ryan");
 		try {
 
 			String json = "{"
