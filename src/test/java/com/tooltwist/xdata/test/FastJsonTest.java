@@ -44,7 +44,7 @@ public class FastJsonTest {
 
 	@Test
 	public void strings_and_literals() {
-fatal("Broken");
+fail("Broken");
 		try {
 			
 			String json = "{"
