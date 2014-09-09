@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/tooltwist/xdata.png?style=badge)](https://circleci.com/gh/tooltwist/xdata)
+
 [Documentation](https://github.com/tooltwist/xdata/wiki) /
 [The 2 Minute Tutorial](https://github.com/tooltwist/xdata/wiki/2-minute-tutorial) /
 [Javadoc](http://tooltwist.github.com/xdata/apidocs/index.html) /
