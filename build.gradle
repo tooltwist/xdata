@@ -84,10 +84,26 @@ task wrapper(type: Wrapper) {
   gradleVersion = '1.12'
 }
 
+/*
+ *	If we're reconfiguring Eclipse, take the opportunity to fix the occasional
+ *	problem where 'Deployment Assembly' is missing from the properties dialog,
+ *	preventing dependency jars from being added to the War and Tomcat classpath.
+ *	http://forums.gradle.org/gradle/topics/my_war_in_eclipse_doesnt_see_jars_in_other_projects
+ */
+eclipse {
+    project {
+        natures 'org.eclipse.wst.common.modulecore.ModuleCoreNature'
+    }
+}
+
 /**************************************************************************************************
  *
  *	Copy various resources into the jar file or into separate zip files.
  */
+task copyWebContent(type: Copy) {
+	from('WebContent')
+	into 'build/classes/main/META-INF/resources'
+}
 task copyConfig(type: Copy) {
 	from('config')
 	into 'build/classes/main/META-INF/tooltwist/config'
@@ -95,10 +111,6 @@ task copyConfig(type: Copy) {
 task copyWidgets(type: Copy) {
 	from('widgets')
 	into 'build/classes/main/META-INF/tooltwist/widgets'
-}
-task copyWebContent(type: Copy) {
-	from('WebContent')
-	into 'build/classes/main/META-INF/resources'
 }
 task configZip(type: Zip) {
 	from 'config'
