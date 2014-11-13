@@ -158,6 +158,7 @@ public class XD_Test {
 
 	@Test
 	public void constructor_xmlString() throws XDException {
+fail("I don't like Mondays");
 		String xml = getXmlString();
 		XD data = new XD(xml);
 		String string = data.getString();		
