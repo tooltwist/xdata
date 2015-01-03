@@ -13,11 +13,20 @@ dependencies {
  *
  *	NOTE: Standard code from here on down.
  *
- *	Values defined in ../gradle.properties:
- *		PROJECT_GROUP, PROJECT_SOURCE_COMPATIBILITY, PROJECT_VERSION, PROJECT_REPO
+ *	Values defined in ./gradle.properties:
+ *		PROJECT_GROUP
+ *		PROJECT_VERSION
+ *		PROJECT_SOURCE_COMPATIBILITY
+ *		PUBLISH_CONTEXTURL
+ *		PUBLISH_SNAPSHOT_REPO
+ *		PUBLISH_RELEASE_REPO
  *
  *	Values defined in ~/.gradle/gradle.properties:
- *		artifactory_user, artifactory_password, artifactory_repo
+ *		RESOLVE_CONTEXTURL
+ *		RESOLVE_REPO
+ *		ARTIFACTORY_USER
+ *		ARTIFACTORY_PASSWORD
+ *
  */
 group = PROJECT_GROUP
 version = PROJECT_VERSION
