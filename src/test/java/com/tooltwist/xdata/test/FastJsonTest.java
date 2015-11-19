@@ -157,4 +157,21 @@ public class FastJsonTest {
 		}
 	}
 
+	@Test
+	public void parse_unicode() {
+		try {
+
+			String json = "{"
+					+ "  \"val1\" : \"aaa\\u0026bbb\""
+					+ "}";
+			FastJson fastJson = new FastJson(json);
+			String val1 = fastJson.getString("val1");
+			
+			assertEquals("Unicode not parsed crrectly.", val1, "aaa&bbb"); 
+
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+
 }
