@@ -45,8 +45,8 @@ public class FastJson implements XSelector, Iterable<XSelector> {
 	private static final int NAME_OFFSET_PARSING_ARRAY = -12;
 
 	// Special characters
-	private static final char ESCAPE = 0x5c;
-	private static final char QUOTE = 0x22;
+	private static final char ESCAPE = 0x5c;	// backslash
+	private static final char QUOTE = 0x22;		// single quote
 	
 	// Blocks of nodes
 	private FastJsonBlockOfNodes firstBlock = new FastJsonBlockOfNodes(0);
@@ -864,7 +864,13 @@ System.out.println(new String(json, offset, json.length-offset));
 		if (end <= start)
 			return;
 		//ZZZZ Should de-escape value
-		value.append(json, start, end-start);
+		//value.append(json, start, end-start);
+
+		String str = new String(json, start, end - start);
+//		String str = json.substring(start, end);
+		str = org.apache.commons.lang3.StringEscapeUtils.unescapeJava(str);
+		value.append(str);
+		
 //		for (int offset = start; offset < end; )
 //		{
 //			if (json[offset] == '&')
